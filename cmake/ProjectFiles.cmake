@@ -11,7 +11,7 @@ list(APPEND flexlib_SOURCES
   ${flexlib_include_DIR}/clangUtils.hpp
   ${flexlib_src_DIR}/clangUtils.cpp
   ${flexlib_include_DIR}/funcParser.hpp
-  #${flexlib_src_DIR}/funcParser.cpp
+  ${flexlib_src_DIR}/funcParser.cpp
   #${flexlib_src_DIR}/DispatchQueue.cpp
   ${flexlib_include_DIR}/DispatchQueue.hpp
   ${flexlib_include_DIR}/matchers/annotation_matcher.hpp

@@ -13,5 +13,5 @@ base::FilePath Options::pathToDirWithPlugins{};
 
 base::FilePath Options::pathToDirWithPluginsConfigFile{};
 
-std::vector<base::FilePath> Options::pathsToPluginFiles{};
+std::vector<base::FilePath> Options::pathsToExtraPluginFiles{};
 }
