@@ -21,5 +21,5 @@ GIT_SSL_NO_VERIFY=true \
       --profile clang \
           -o flexlib:shared=False \
           -o flexlib:enable_clang_from_conan=False \
-          -o flexlib:enable_tests=True
+          -e flexlib:enable_tests=True
 ```
