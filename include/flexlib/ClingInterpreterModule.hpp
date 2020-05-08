@@ -52,6 +52,19 @@
 
 namespace cling_utils {
 
+/// \note requires to wrap all arguments into struct or class
+/// and cast them into |void*|
+/// \note pass as |codeToCastArgumentFromVoid| string similar to:
+/// *(const originalType*)
+/// That way you will cast |void*| to |originalType|
+/// Don't forget to |#include| header with |originalType|
+/// declaration in file loaded by |loadFile|. It must contain
+/// function that you want to call
+std::string
+  passCppPointerIntoInterpreter(
+    void* argumentAsVoid
+    , const std::string& codeToCastArgumentFromVoid);
+
 class ClingInterpreter {
 public:
   ClingInterpreter(const std::string& debug_id
