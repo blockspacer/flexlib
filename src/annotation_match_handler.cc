@@ -42,8 +42,9 @@ void AnnotationMatchHandler::matchHandler(
   DCHECK(nodeDecl && !nodeDecl->isInvalidDecl());
   DCHECK(annotateAttr);
 
-  DLOG(INFO) << "annotateAttr->getAnnotation()"
-               << annotateAttr->getAnnotation().str();
+  DLOG(INFO)
+    << "found annotation method: "
+    << annotateAttr->getAnnotation().str();
 
   std::string resultWithoutMethod;
   DCHECK(annotationParser_);
@@ -52,6 +53,9 @@ void AnnotationMatchHandler::matchHandler(
         annotateAttr->getAnnotation().str(), resultWithoutMethod);
 
   if(callback_iter == annotationMethods->end()) {
+    LOG(WARNING)
+      << "unable to handle unregistered annotation method:"
+      << annotateAttr->getAnnotation().str();
     return;
   }
 
