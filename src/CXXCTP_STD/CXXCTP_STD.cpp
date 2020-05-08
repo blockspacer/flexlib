@@ -57,45 +57,6 @@ findCXXRecordNameEndPoint(clang::CXXRecordDecl const *decl,
   return Location.getLocWithOffset(0);
 }
 
-const bool isReflectable(clang::DeclaratorDecl* decl) {
-  bool res = false;
-  if ( auto annotate = decl->getAttr<clang::AnnotateAttr>() )
-  {
-    //
-    const std::string gen_token = "{gen};{attr};";
-    std:: string code =
-      annotate->getAnnotation().str();
-    const bool startsWithGen =
-      code.rfind(gen_token, 0) == 0;
-    code.erase(0, gen_token.size());
-    if (startsWithGen) {
-      DLOG(INFO) << "isReflectable code() " << code;
-      std::string delimiter = ";";
-      size_t pos = 0;
-      std::string token;
-      while ((pos = code.find(delimiter)) != std::string::npos) {
-        token = code.substr(0, pos);
-        DLOG(INFO) << "isReflectable token " << token;
-        if(token == "reflectable") {
-          res = true;
-          break;
-        }
-        code.erase(0, pos + delimiter.length());
-      }
-      if(!code.empty()
-         && code == "reflectable") {
-        res = true;
-      }
-    }
-  }
-
-  DLOG(INFO) << "isReflectable attr() "
-    << decl->getNameAsString()
-    << "is " << res;
-
-  return res;
-}
-
 std::string wrapLocalInclude(const std::string& inStr) {
     std::string result = R"raw(#include ")raw";
     result += inStr;
