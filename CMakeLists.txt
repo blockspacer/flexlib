@@ -286,8 +286,28 @@ list(APPEND USED_3DPARTY_LIBS
   CONAN_PKG::corrade
   Corrade::PluginManager
   ${USED_BOOST_LIBS}
-  #boost_outcome
-  #microsoft_gsl
+)
+
+set(USED_SYSTEM_LIBS
+    Threads::Threads # pthread, https://cmake.org/cmake/help/v3.13/module/FindThreads.html
+    ${X11_LIBRARIES} # https://cmake.org/cmake/help/v3.13/module/FindX11.html
+    ${CMAKE_DL_LIBS} # https://cmake.org/cmake/help/v3.13/variable/CMAKE_DL_LIBS.html
+    EXPAT::EXPAT # https://cmake.org/cmake/help/v3.13/module/FindEXPAT.html
+    ZLIB::ZLIB # https://cmake.org/cmake/help/v3.13/module/FindZLIB.html
+               # Custom libs
+    stdc++fs # C++17 std::filesystem
+    # @note: Order matters https://stackoverflow.com/a/10269201/10904212
+    ${LIBIBERTY_LIBRARY} # used by folly
+    ${DOUBLE_CONVERSION_LIBRARY} # used by folly
+    ${LIBEVENT_LIB} # used by folly
+    ${LZ4_LIBRARY} # used by folly
+    ${LIBUNWIND_LIBRARIES} # used by folly
+    ${LIBLZMA_LIBRARIES} # used by folly
+    CACHE INTERNAL "USED_SYSTEM_LIBS")
+
+target_link_libraries(${LIB_NAME} INTERFACE
+  ${USED_3DPARTY_LIBS}
+  ${USED_SYSTEM_LIBS}
 )
 
 set_property(TARGET ${LIB_NAME} PROPERTY CXX_STANDARD 17)
@@ -344,83 +364,6 @@ if(ENABLE_CLING)
   list(APPEND CLING_DEFINITIONS CLING_IS_ON=1)
   target_link_libraries(${LIB_NAME} PUBLIC#PRIVATE
     CONAN_PKG::cling_conan
-    #-lLLVMOption
-    #-lclangTooling
-    #-lclangFrontendTool
-    #-lclangFrontend
-    #-lclangDriver
-    #-lclangSerialization
-    #-lclangCodeGen
-    #-lclangParse
-    #-lclangSema
-    #-lclangStaticAnalyzerFrontend
-    #-lclangStaticAnalyzerCheckers
-    #-lclangStaticAnalyzerCore
-    #-lclangAnalysis
-    #-lclangARCMigrate
-    #-lclangRewrite
-    #-lclangRewriteFrontend
-    #-lclangEdit
-    #-lclangAST
-    #-lclangLex
-    #-lclangBasic
-    #-lclang
-    #-lcling
-    #-lclingInterpreter
-    #
-    #clangARCMigrate
-    #clangAnalysis
-    #clangAST
-    #clangASTMatchers
-    #clangBasic
-    #clangCodeGen
-    #clangDriver
-    #clangDynamicASTMatchers
-    #clangEdit
-    #clangFormat
-    #clangFrontend
-    #clangFrontendTool
-    #clangIndex
-    #clangLex
-    #clangParse
-    #clangRewrite
-    #clangRewriteFrontend
-    #clangSema
-    #clangSerialization
-    #clangStaticAnalyzerCheckers
-    #clangStaticAnalyzerCore
-    #clangStaticAnalyzerFrontend
-    #clangTooling
-    #clangToolingCore
-    #clangToolingRefactor
-    #clangStaticAnalyzerCore
-    #clangDynamicASTMatchers
-    #clangCodeGen
-    #clangFrontendTool
-    #clang.so
-    #clangEdit
-    #clangRewriteFrontend
-    #clangDriver
-    #clangSema
-    #clangASTMatchers
-    #clangSerialization
-    #clangBasic
-    #clangAST
-    #clangTooling
-    #clangStaticAnalyzerFrontend
-    #clangFormat
-    #clangToolingRefactor
-    #clangLex
-    #clangFrontend
-    #clangRewrite
-    #clangToolingCore
-    #clangIndex
-    #clangAnalysis
-    #clangParse
-    #clangStaticAnalyzerCheckers
-    #clangARCMigrate
-    #cling
-    #clingInterpreter
   )
 
   get_target_property (cling_conan_IMPORTED_LOCATION CONAN_PKG::cling_conan INTERFACE_INCLUDE_DIRECTORIES)
