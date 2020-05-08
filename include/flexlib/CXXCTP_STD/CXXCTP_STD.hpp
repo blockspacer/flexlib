@@ -57,11 +57,11 @@ struct cxxctp_callback_args {
   const cxxctp::parsed_func& func_with_args;
   const clang::ast_matchers::MatchFinder::MatchResult& matchResult;
   clang::Rewriter& rewriter;
-  const clang::Decl* decl;
+  const clang::Decl* decl = nullptr;
   const std::vector<cxxctp::parsed_func>& all_func_with_args;
 };
 
 struct cxxctp_callback_result {
-  ///\brief ay be used to replace orginal code
-  const char* replacer;
+  ///\brief may be used to replace orginal code
+  const char* replacer = nullptr;
 };

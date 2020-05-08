@@ -1,5 +1,7 @@
 ﻿#include "flexlib/clangUtils.hpp" // IWYU pragma: associated
 
+#include <base/logging.h>
+
 namespace clang_utils {
 
 std::string printMethodDecl(const clang::Decl* decl, clang::CXXRecordDecl const * node, clang::CXXMethodDecl* fct) {
@@ -157,16 +159,43 @@ std::string printMethodDecl(const clang::Decl* decl, clang::CXXRecordDecl const 
 
 void expandLocations(clang::SourceLocation& startLoc,
                      clang::SourceLocation& endLoc,
-                     clang::Rewriter& rewriter_) {
-    if( startLoc.isMacroID() ) {
-        // Get the start/end expansion locations
-        std::pair< clang::SourceLocation, clang::SourceLocation > expansionRange =
-            rewriter_.getSourceMgr().getImmediateExpansionRange( startLoc );
+                     clang::Rewriter& rewriter_)
+{
+  // macros need a special handling, because we are interessted in the macro
+  // instanciation location and not in the macro definition location
+  clang::SourceManager& sm = rewriter_.getSourceMgr();
 
+  for (size_t i = 0; startLoc.isMacroID(); i++) {
+      DCHECK(i < std::numeric_limits<size_t>::max());
+
+      // See skipToMacroArgExpansion()
+      for (clang::SourceLocation L = startLoc; L.isMacroID();
+         L = sm.getImmediateSpellingLoc(L)) {
+        if (sm.isMacroArgExpansion(L)) {
+          startLoc = L;
+          break;
+        }
+      }
+
+      startLoc =
+        sm.isMacroArgExpansion(startLoc)
         // We're just interested in the start location
-        startLoc = expansionRange.first;
-        endLoc = expansionRange.second;
-    }
+        ? sm.getImmediateSpellingLoc(startLoc)
+        : sm.getImmediateExpansionRange( startLoc ).first;
+
+      // Get the start/end expansion locations
+      //std::pair< clang::SourceLocation, clang::SourceLocation >
+      //  expansionRange =
+      //    sm.isMacroArgExpansion(startLoc)
+      //    ? sm.getImmediateSpellingLoc(startLoc)
+      //    : sm.getImmediateExpansionRange( startLoc );
+
+      // We're just interested in the start location
+      //startLoc = expansionRange.first;
+
+      // will not be executed
+      //endLoc = expansionRange.second;
+  }
 }
 
 } // namespace clang_utils
