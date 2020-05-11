@@ -1,3 +1,4 @@
+#if 0
 #include "flexlib/CXXCTP_STD/CXXCTP_STD.hpp"
 
 #include <clang/Lex/Lexer.h>
@@ -9,7 +10,8 @@
 
 clang::SourceLocation
 findPureInsertionPoint(clang::CXXMethodDecl *MethodDecl,
-                   const clang::ASTContext &Context) {
+                   const clang::ASTContext &Context)
+{
   clang::SourceLocation Location;
 
   /// Find the end of the parameter list.
@@ -30,14 +32,16 @@ findPureInsertionPoint(clang::CXXMethodDecl *MethodDecl,
 }
 
 clang::SourceRange
-findFuncBodyRange(clang::CXXMethodDecl *MethodDecl,
-                   const clang::ASTContext &Context) {
+findFuncBodyRange(clang::CXXMethodDecl *MethodDecl
+  , const clang::ASTContext &Context)
+{
   return MethodDecl->getBody()->getSourceRange();
 }
 
 clang::SourceLocation
-findVirtualInsertionPoint(clang::CXXMethodDecl *MethodDecl,
-                   const clang::ASTContext &Context) {
+findVirtualInsertionPoint(clang::CXXMethodDecl* MethodDecl
+                          , const clang::ASTContext&)
+{
   clang::SourceLocation Location;
 
   Location = MethodDecl->getLocStart();
@@ -46,8 +50,10 @@ findVirtualInsertionPoint(clang::CXXMethodDecl *MethodDecl,
 }
 
 clang::SourceLocation
-findCXXRecordNameEndPoint(clang::CXXRecordDecl const *decl,
-                   const clang::ASTContext &Context) {
+findCXXRecordNameEndPoint(
+  clang::CXXRecordDecl const* decl
+  , const clang::ASTContext&)
+{
   clang::SourceLocation Location;
 
   /// Find the end of name.
@@ -57,33 +63,45 @@ findCXXRecordNameEndPoint(clang::CXXRecordDecl const *decl,
   return Location.getLocWithOffset(0);
 }
 
-std::string wrapLocalInclude(const std::string& inStr) {
+std::string wrapLocalInclude(const std::string& inStr)
+{
     std::string result = R"raw(#include ")raw";
     result += inStr;
     result += R"raw(")raw";
     return result;
 };
 
-std::string get_func_arg(const std::vector<cxxctp::parsed_func>& args, const std::string& funcName, const int index) {
-    std::string result;
-    for (auto const& seg : args) {
-        if(!seg.parsed_func_.func_name_.empty() && seg.parsed_func_.func_name_ == funcName) {
-            if(index < seg.parsed_func_.args_.as_vec_.size()) {
-                result = seg.parsed_func_.args_.as_vec_.at(index).value_;
-            }
-            break;
-        }
+std::string get_func_arg(
+  const std::vector<flexlib::parsed_func>& args
+  , const std::string& funcName
+  , const int index)
+{
+  std::string result;
+  for (auto const& seg : args) {
+    if(!seg.parsed_func_.func_name_.empty()
+       && seg.parsed_func_.func_name_ == funcName)
+    {
+      if(index < seg.parsed_func_.args_.as_vec_.size()) {
+          result = seg.parsed_func_.args_.as_vec_.at(index).value_;
+      }
+      break;
     }
-    return result;
+  }
+  return result;
 }
 
-cxxctp::args get_func_args(const std::vector<cxxctp::parsed_func>& args, const std::string& funcName) {
-    for (auto const& seg : args) {
-        if(!seg.parsed_func_.func_name_.empty() && seg.parsed_func_.func_name_ == funcName) {
-            return seg.parsed_func_.args_;
-        }
+flexlib::args get_func_args(
+  const std::vector<flexlib::parsed_func>& args
+  , const std::string& funcName)
+{
+  for (auto const& seg : args) {
+    if(!seg.parsed_func_.func_name_.empty()
+       && seg.parsed_func_.func_name_ == funcName)
+    {
+        return seg.parsed_func_.args_;
     }
-    return cxxctp::args{};
+  }
+  return flexlib::args{};
 }
 
 void prepareTplArg(std::string &in)
@@ -98,3 +116,4 @@ void prepareTplArg(std::string &in)
     std::remove( in.begin(), in.end(), ' ' ),
     in.end());*/
 }
+#endif

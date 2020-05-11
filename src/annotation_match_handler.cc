@@ -17,17 +17,19 @@ namespace fs = std::filesystem;
 namespace fs = std::experimental::filesystem;
 #endif // __has_include
 
-namespace cxxctp {
+namespace flexlib {
 
 AnnotationMatchHandler::AnnotationMatchHandler(
   AnnotationParser* annotationParser
-  , AnnotationMethods* supportedAnnotationMethods)
+  , AnnotationMethods* supportedAnnotationMethods
+  , SaveFileHandler&& saveFileHandler)
   : annotationParser_(annotationParser)
-  , annotationMethods(supportedAnnotationMethods)
+  , annotationMethods_(supportedAnnotationMethods)
+  , saveFileHandler_(std::move(saveFileHandler))
 {
   DETACH_FROM_SEQUENCE(sequence_checker_);
 
-  DCHECK(annotationMethods);
+  DCHECK(annotationMethods_);
   DCHECK(annotationParser_);
 }
 
@@ -52,7 +54,7 @@ void AnnotationMatchHandler::matchHandler(
     = annotationParser_->parseToMethods(
         annotateAttr->getAnnotation().str(), resultWithoutMethod);
 
-  if(callback_iter == annotationMethods->end()) {
+  if(callback_iter == annotationMethods_->end()) {
     LOG(WARNING)
       << "unable to handle unregistered annotation method:"
       << annotateAttr->getAnnotation().str();
@@ -73,31 +75,10 @@ void AnnotationMatchHandler::endSourceFileHandler(
 {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
 
-  std::string full_file_path = fileEntry->getName();
-  DLOG(INFO) << "full_file_path is " << full_file_path;
-  const std::string filename = fs::path(full_file_path).filename();
-  DLOG(INFO) << "filename is " << filename;
-
-  DLOG(INFO) << "** EndSourceFileAction for: "
-               << fileEntry->getName().str();
-  const std::string full_file_ext = fs::path(full_file_path).extension();
-
-  const fs::path out_path = fs::absolute(ctp::Options::res_path
-    / (filename + ".generated" + full_file_ext));
-
-  bool shouldFlush = true; // TODO: make optional for some files
-  if (shouldFlush) {
-      /*const std::string file_ext = full_file_path.substr(
-          filename.find_last_of(".") + 1);*/
-      if(!full_file_path.empty() && !full_file_ext.empty()) {
-          DLOG(INFO) << "full_file_ext = " << full_file_ext;
-          //full_file_path.erase(full_file_path.length() - full_file_ext.length(), full_file_ext.length());
-          std::error_code error_code;
-          llvm::raw_fd_ostream outFile(out_path.string(), error_code, llvm::sys::fs::F_None);
-          rewriter.getEditBuffer(fileID).write(outFile);
-          outFile.close();
-      }
-  }
+  CHECK(saveFileHandler_);
+  saveFileHandler_.Run(fileID
+                  , fileEntry
+                  , rewriter);
 }
 
-} // namespace cxxctp
+} // namespace flexlib

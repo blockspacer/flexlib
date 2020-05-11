@@ -125,6 +125,8 @@ private:
 
 // We choose an ASTFrontendAction because we want to analyze
 // the AST representation of the source code
+/// \note For each source file provided to the tool,
+/// a new FrontendAction is created.
 class AnnotationMatchAction
   : public clang::ASTFrontendAction
 {

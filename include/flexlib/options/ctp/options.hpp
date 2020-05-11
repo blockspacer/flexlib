@@ -20,26 +20,26 @@ namespace fs = std::experimental::filesystem;
 namespace ctp {
 
 /// \todo use base::PathService
-struct Options {
-  // input files dir
-  static fs::path src_path;
-
-  // output files dir
-  static fs::path res_path;
-
-  // path to directory with plugins
-  static base::FilePath pathToDirWithPlugins;
-
-  // path to plugins configuration file
-  static base::FilePath pathToDirWithPluginsConfigFile;
-
-  /// \todo remove
-  static std::vector<fs::path> ctp_scripts_search_paths;
-
-  // Paths to plugin files that
-  // must be loaded independently from plugins configuration file.
-  // Usually path to plugin file ends in .so or .dll
-  static std::vector<base::FilePath> pathsToExtraPluginFiles;
-};
+//struct Options {
+//  // input files dir
+//  static fs::path src_path;
+//
+//  // output files dir
+//  static fs::path res_path;
+//
+//  // path to directory with plugins
+//  static base::FilePath pathToDirWithPlugins;
+//
+//  // path to plugins configuration file
+//  static base::FilePath pathToDirWithPluginsConfigFile;
+//
+//  /// \todo remove
+//  static std::vector<fs::path> ctp_scripts_search_paths;
+//
+//  // Paths to plugin files that
+//  // must be loaded independently from plugins configuration file.
+//  // Usually path to plugin file ends in .so or .dll
+//  static std::vector<base::FilePath> pathsToExtraPluginFiles;
+//};
 
 }

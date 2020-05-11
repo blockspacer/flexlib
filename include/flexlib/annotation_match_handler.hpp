@@ -3,8 +3,6 @@
 #include "flexlib/annotation_parser.hpp"
 #include "flexlib/matchers/annotation_matcher.hpp"
 
-#include <string>
-
 #include <clang/Rewrite/Core/Rewriter.h>
 #include <clang/ASTMatchers/ASTMatchers.h>
 #include <clang/AST/ASTContext.h>
@@ -17,6 +15,7 @@
 #include <clang/Tooling/Tooling.h>
 #include <clang/Rewrite/Core/Rewriter.h>
 
+#include <base/bind.h>
 #include <base/macros.h>
 #include <base/callback_forward.h>
 #include <base/logging.h>
@@ -30,13 +29,23 @@
 #include <base/compiler_specific.h>
 #include <base/synchronization/atomic_flag.h>
 
-namespace cxxctp {
+#include <string>
+
+namespace flexlib {
 
 class AnnotationMatchHandler {
 public:
+  using SaveFileHandler
+    = base::RepeatingCallback<
+        void(const clang::FileID& fileID
+        , const clang::FileEntry* fileEntry
+        , clang::Rewriter& rewriter)
+      >;
+
   AnnotationMatchHandler(
     AnnotationParser* annotationParser
-    , AnnotationMethods* supportedAnnotationMethods);
+    , AnnotationMethods* supportedAnnotationMethods
+    , SaveFileHandler&& saveFileHandler);
 
   // may be used to rewrite matched clang declaration
   void matchHandler(
@@ -56,9 +65,11 @@ private:
 
   AnnotationParser* annotationParser_;
 
-  AnnotationMethods* annotationMethods;
+  AnnotationMethods* annotationMethods_;
+
+  SaveFileHandler saveFileHandler_;
 
   DISALLOW_COPY_AND_ASSIGN(AnnotationMatchHandler);
 };
 
-} // namespace cxxctp
+} // namespace flexlib

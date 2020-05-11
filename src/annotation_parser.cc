@@ -2,7 +2,7 @@
 
 #include "flexlib/parser_constants.hpp"
 
-namespace cxxctp {
+namespace flexlib {
 
 AnnotationParser::AnnotationParser(
   AnnotationMethods* supportedAnnotationMethods)
@@ -40,7 +40,7 @@ AnnotationMethods::const_iterator AnnotationParser::parseToMethods(
   const bool startsWithGen
     = tryRemovePrefix(unprocessedAnnotation
                       , resultWithoutPrefix
-                      , ::cxxctp::kRequiredAnnotationPrefix);
+                      , ::flexlib::kRequiredAnnotationPrefix);
   if(!startsWithGen) {
     return annotationMethods->end();
   }
@@ -63,4 +63,4 @@ AnnotationMethods::const_iterator AnnotationParser::parseToMethods(
   return annotationMethods->end();
 }
 
-} // namespace cxxctp
+} // namespace flexlib

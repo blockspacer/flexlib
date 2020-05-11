@@ -60,7 +60,7 @@ class ToolPlugin
     };
 
     struct RegisterAnnotationMethods {
-      mutable ::cxxctp::AnnotationMethods*
+      mutable ::flexlib::AnnotationMethods*
         annotationMethods;
       mutable ::clang_utils::SourceTransformPipeline*
         sourceTransformPipeline;

@@ -1,6 +1,6 @@
 ﻿#include "flexlib/parser_constants.hpp" // IWYU pragma: associated
 
-namespace cxxctp {
+namespace flexlib {
 
 // USAGE:
 // auto hasAnnotate = clang::ast_matchers::hasAttr( clang::attr::Annotate );
@@ -16,4 +16,4 @@ const char kAnnotateAttrName[] = "bind_gen";
 // ;
 const char kRequiredAnnotationPrefix[] = "{gen};";
 
-} // namespace cxxctp
+} // namespace flexlib

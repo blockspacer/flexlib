@@ -4,19 +4,22 @@
 #include <vector>
 #include <map>
 
-/*#include <boost/spirit/home/x3/core.hpp>
-#include <boost/spirit/home/x3/operator.hpp>
-#include <boost/spirit/home/x3/char.hpp>*/
+namespace flexlib {
 
-namespace cxxctp {
-
-struct func_arg {
+// EXAMPLE:
+// foo(a=1,
+//   b ,  c  =  3 )
+// RESULT:
+// functionArgument{"a", "1"}
+// functionArgument{"b", ""}
+// functionArgument{"c", "3"}
+struct functionArgument {
   std::string name_;
   std::string value_;
 };
 
 struct args {
-  std::vector<func_arg> as_vec_;
+  std::vector<functionArgument> as_vec_;
   std::map<std::string, std::vector<std::string>> as_name_to_value_;
 };
 
@@ -31,8 +34,8 @@ struct parsed_func {
   parsed_func_detail parsed_func_;
 };
 
-func_arg extract_func_arg(std::string const& inStr);
+functionArgument extract_func_arg(std::string const& inStr);
 
 std::vector<parsed_func> split_to_funcs(std::string const& inStr);
 
-} // namespace cxxctp
+} // namespace flexlib

@@ -3,14 +3,19 @@
 #include <cassert>
 #include <sstream>
 #include <iomanip>
-//#include <iostream>
 
-namespace cxxctp {
+namespace flexlib {
 
-func_arg extract_func_arg(std::string const& inStr) {
+namespace {
+
+static const char kArgumentAssign = '=';
+
+} // namespace
+
+functionArgument extract_func_arg(std::string const& inStr) {
   std::string arg_value_ = inStr;
   std::string arg_name_ = "";
-  auto delim_pos = inStr.find('=');
+  auto delim_pos = inStr.find(kArgumentAssign);
   if(delim_pos != std::string::npos) {
     arg_name_ = inStr.substr(0, delim_pos);
     if(!arg_name_.empty()) {
@@ -21,8 +26,8 @@ func_arg extract_func_arg(std::string const& inStr) {
   return {arg_name_, arg_value_};
 }
 
-std::vector<cxxctp::parsed_func> split_to_funcs(std::string const& inStr) {
-  std::vector<cxxctp::parsed_func> result;
+std::vector<flexlib::parsed_func> split_to_funcs(std::string const& inStr) {
+  std::vector<flexlib::parsed_func> result;
   std::stringstream ss;
   ss << inStr
     << ";"; // close funcs list with ';'
@@ -31,7 +36,7 @@ std::vector<cxxctp::parsed_func> split_to_funcs(std::string const& inStr) {
   std::string func_name_unprocessed_;
   std::string func_arg_as_str;
   bool is_in_args = false;
-  std::vector<func_arg> func_args_vec_;
+  std::vector<functionArgument> func_args_vec_;
   std::map<std::string, std::vector<std::string>> func_args_as_name_to_value_;
   while (ss >> std::ws) {
       if (ss.peek() == '"') { // TODO: inner "
@@ -54,7 +59,7 @@ std::vector<cxxctp::parsed_func> split_to_funcs(std::string const& inStr) {
       else if (ss.peek() == ')') {
           is_in_args = false;
 
-          func_arg arg_parsed = extract_func_arg(func_arg_as_str);
+          functionArgument arg_parsed = extract_func_arg(func_arg_as_str);
           func_args_vec_.push_back(arg_parsed);
           if(!arg_parsed.name_.empty()) {
             if(func_args_as_name_to_value_.find(arg_parsed.name_) != func_args_as_name_to_value_.end()) {
@@ -72,7 +77,7 @@ std::vector<cxxctp::parsed_func> split_to_funcs(std::string const& inStr) {
       else if (ss.peek() == ',') {
           assert(is_in_args);
 
-          func_arg arg_parsed = extract_func_arg(func_arg_as_str);
+          functionArgument arg_parsed = extract_func_arg(func_arg_as_str);
           func_args_vec_.push_back(arg_parsed);
           if(!arg_parsed.name_.empty()) {
             if(func_args_as_name_to_value_.find(arg_parsed.name_) != func_args_as_name_to_value_.end()) {
@@ -104,7 +109,7 @@ std::vector<cxxctp::parsed_func> split_to_funcs(std::string const& inStr) {
             func_name_unprocessed_ = func_with_args_;
           }
           result.push_back(
-            cxxctp::parsed_func{
+            flexlib::parsed_func{
               func_with_args_,
               {
                 func_name_unprocessed_,
@@ -134,4 +139,4 @@ std::vector<cxxctp::parsed_func> split_to_funcs(std::string const& inStr) {
   return result;
 }
 
-} // namespace cxxctp
+} // namespace flexlib

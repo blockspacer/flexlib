@@ -403,7 +403,6 @@ target_compile_definitions(${LIB_NAME} PRIVATE
   ${flexlib_PRIVATE_DEFINES}
   # https://stackoverflow.com/a/30877725
   BOOST_SYSTEM_NO_DEPRECATED BOOST_ERROR_CODE_HEADER_ONLY
-  IS_CXXCTP=1
 )
 
 target_compile_definitions(${LIB_NAME} PUBLIC

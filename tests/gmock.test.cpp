@@ -158,22 +158,36 @@
 #include <clang/Tooling/Tooling.h>
 
 TEST(AnnotationParser, LinksWithClingLLVM) {
-  ::cxxctp::AnnotationMethods annotationMethods;
+  ::flexlib::AnnotationMethods annotationMethods;
   ::clang_utils::SourceTransformPipeline sourceTransformPipeline;
 
-  ::cxxctp::AnnotationParser annotationParser(&annotationMethods);
+  ::flexlib::AnnotationParser annotationParser(&annotationMethods);
+  ::flexlib::AnnotationMatchHandler::SaveFileHandler saveFileHandler
+    = base::BindRepeating(
+    [
+    ](
+      const clang::FileID&
+      , const clang::FileEntry*
+      , clang::Rewriter&
+    ){
+      // empty
+    }
+  );
 
-  ::cxxctp::AnnotationMatchHandler anotationMatchHandler(
-    &annotationParser, &annotationMethods);
+  ::flexlib::AnnotationMatchHandler anotationMatchHandler(
+    &annotationParser
+    , &annotationMethods
+    , std::move(saveFileHandler));
+
   scoped_refptr<clang_utils::AnnotationMatchOptions>
     annotationMatchOptions
       = new clang_utils::AnnotationMatchOptions(
-          ::cxxctp::kAnnotateAttrName
+          ::flexlib::kAnnotateAttrName
           , base::BindRepeating(
-              &::cxxctp::AnnotationMatchHandler::matchHandler
+              &::flexlib::AnnotationMatchHandler::matchHandler
               , base::Unretained(&anotationMatchHandler))
           , base::BindRepeating(
-              &::cxxctp::AnnotationMatchHandler::endSourceFileHandler
+              &::flexlib::AnnotationMatchHandler::endSourceFileHandler
               , base::Unretained(&anotationMatchHandler))
         );
 

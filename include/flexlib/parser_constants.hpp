@@ -2,11 +2,11 @@
 
 #include <string>
 
-namespace cxxctp {
+namespace flexlib {
 
 // name of |clang::Decl| to search
 extern const char kAnnotateAttrName[];
 
 extern const char kRequiredAnnotationPrefix[];
 
-} // namespace cxxctp
+} // namespace flexlib

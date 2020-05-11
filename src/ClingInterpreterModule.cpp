@@ -2,6 +2,8 @@
 
 #if defined(CLING_IS_ON)
 
+#include "flexlib/options/ctp/options.hpp"
+
 /// \todo use boost outcome for error reporting
 #include <base/logging.h>
 
@@ -15,8 +17,6 @@ namespace fs = std::filesystem;
 #include <experimental/filesystem>
 namespace fs = std::experimental::filesystem;
 #endif
-
-#include "flexlib/options/ctp/options.hpp"
 
 namespace cling_utils {
 
@@ -45,23 +45,38 @@ ClingInterpreter::ClingInterpreter(
 {
   DETACH_FROM_SEQUENCE(sequence_checker_);
 
+  CHECK(!interpreterArgs.empty())
+    << "You must provide at least one argument"
+       " to Cling interpreter";
+
   DCHECK(!debug_id_.empty());
 
-  /// \todo
-  /// refactor vector<std::string> to vector<const char*> conversion
-  std::vector< const char* > interp_args;
-  {
-      std::vector< std::string >::const_iterator iarg;
-      for( iarg = interpreterArgs.begin()
-           ; iarg != interpreterArgs.end() ; ++iarg ) {
-          interp_args.push_back(iarg->c_str());
-      }
-  }
+  std::vector<
+    const char* /// \note must manage pointer lifetime
+  > args;
+
+  std::transform(
+    interpreterArgs.begin()
+    , interpreterArgs.end()
+    , std::back_inserter(args)
+    , [](const std::string& value)
+    {
+        VLOG(9)
+          << "added command-line argument for Cling interpreter: "
+          << value;
+        DCHECK(!value.empty());
+        /// \note must manage pointer lifetime
+        return value.c_str();
+    });
+
+  CHECK(!args.empty())
+    << "You must provide at least one argument"
+       " to Cling interpreter";
 
   interpreter_
     = std::make_unique<cling::Interpreter>(
-        interp_args.size()
-        , &(interp_args[0])
+        args.size()
+        , &(args[0])
         , LLVMDIR);
 
   for(const std::string& it: includePaths) {
@@ -93,7 +108,7 @@ cling::Interpreter::CompilationResult
   cling::Interpreter::CompilationResult compilationResult;
 
   LOG(INFO)
-    << "started C++ file loding using Cling...";
+    << "started C++ file loading using Cling...";
 
   {
     DCHECK(metaProcessor_);
@@ -203,10 +218,6 @@ cling::Interpreter::CompilationResult
       // Pass a pointer into cling as a string.
       , codeToCastArgumentFromVoid
     );
-    //code_str << codeToCastArgumentFromVoid << "("
-    //     // Pass a pointer into cling as a string.
-    //     << std::hex << std::showbase
-    //     << reinterpret_cast<size_t>(argumentAsVoid) << ')';
     // func end
     code_str << " );" << ";";
     // scope end

@@ -29,7 +29,7 @@
 #include <base/compiler_specific.h>
 #include <base/synchronization/atomic_flag.h>
 
-namespace cxxctp {
+namespace flexlib {
 
 typedef
   base::RepeatingCallback<
@@ -69,4 +69,4 @@ private:
   DISALLOW_COPY_AND_ASSIGN(AnnotationParser);
 };
 
-} // namespace cxxctp
+} // namespace flexlib
