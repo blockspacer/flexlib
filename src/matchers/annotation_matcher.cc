@@ -139,11 +139,10 @@ void AnnotateMatchCallback::run(
     const auto& FileID = SM.getFileID(nodeDecl->getLocation());
     if (FileID != mainFileID) {
       DVLOG(10)
-        << "skipped decl in included file: "
+        << "decl in included file: "
         << nodeDecl->getLocation().printToString(SM).substr(0, 1000)
         << " for annotation name: "
         << annotateOptions_->annotateName;
-      return;
     }
   }
 
