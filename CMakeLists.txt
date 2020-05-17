@@ -19,6 +19,7 @@ set(BUILD_SHARED_LIBS
 
 if(BUILD_SHARED_LIBS)
   set(CORE_LIB_TYPE SHARED)
+  message(FATAL_ERROR "flexlib supports only static builds (for now)")
 else()
   set(CORE_LIB_TYPE STATIC)
 endif(BUILD_SHARED_LIBS)
@@ -231,11 +232,11 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/)
 set(flexlib_include_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/flexlib")
 set(flexlib_src_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
-include(cmake/PlatformChecks)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/PlatformChecks.cmake)
 
-include(cmake/CommonOptions)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CommonOptions.cmake)
 
-include(cmake/ProjectFiles)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/ProjectFiles.cmake)
 
 add_library(${LIB_NAME}-test-includes INTERFACE)
 
@@ -250,6 +251,7 @@ macro(add_relative_include_dir TARGET VISIBILITY_BUILD VISIBILITY_INSTALL NEW_EL
     ${CMAKE_CURRENT_SOURCE_DIR}/${NEW_ELEM} )
 endmacro(add_relative_include_dir)
 
+message(STATUS "flexlib_SOURCES=${flexlib_SOURCES}")
 # NOTE: cling does not support static libs, so we use SHARED
 # https://github.com/root-project/cling/issues/280
 # https://gitlab.kitware.com/cmake/cmake/issues/16473
@@ -411,7 +413,7 @@ target_compile_definitions(${LIB_NAME} PUBLIC
 )
 
 # install and export steps
-include(cmake/Exports)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Exports.cmake)
 
 if(ENABLE_TESTS)
   add_subdirectory( tests )
