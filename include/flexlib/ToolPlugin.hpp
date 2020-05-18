@@ -66,6 +66,11 @@ class ToolPlugin
         sourceTransformPipeline;
     };
 
+    struct Init {
+      int argc;
+      char** argv;
+    };
+
 #if defined(CLING_IS_ON)
     struct RegisterClingInterpreter {
       mutable ::cling_utils::ClingInterpreter* clingInterpreter;

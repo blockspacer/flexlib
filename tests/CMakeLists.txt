@@ -231,7 +231,7 @@ endif()
 
 # "pimpl" is one of test program names
 
-message(STATUS "flextool: copying ${CMAKE_CURRENT_SOURCE_DIR}/data")
+message(STATUS "flexlib: copying ${CMAKE_CURRENT_SOURCE_DIR}/data")
 # "pimpl" is one of test program names
 add_custom_command( TARGET ${ROOT_PROJECT_NAME}-pimpl POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy_directory

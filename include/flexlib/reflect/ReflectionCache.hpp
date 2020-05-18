@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#if 0
 #include "flexlib/reflect/ReflTypes.hpp"
 #include "flexlib/reflect/ReflectAST.hpp"
 #include "flexlib/clangPipeline.hpp"
@@ -31,3 +32,4 @@ public:
 };
 
 } // namespace reflection
+#endif // 0

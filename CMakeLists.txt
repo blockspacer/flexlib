@@ -13,16 +13,22 @@ set(LIB_NAME ${PROJECT_NAME})
 
 option(ENABLE_TESTS "Enable tests" OFF)
 
-set(BUILD_SHARED_LIBS
+# Hack to depend NOT on CONAN_PKG::libname, but on libname directly
+# See for details
+# https://docs.conan.io/en/latest/developing_packages/workspaces.html
+set(LOCAL_BUILD FALSE CACHE BOOL "LOCAL_BUILD")
+message(STATUS "LOCAL_BUILD=${LOCAL_BUILD}")
+
+set(${PROJECT_NAME}_BUILD_SHARED_LIBS
   FALSE CACHE BOOL
   "Use .so/.dll")
 
-if(BUILD_SHARED_LIBS)
+if(${PROJECT_NAME}_BUILD_SHARED_LIBS)
   set(CORE_LIB_TYPE SHARED)
   message(FATAL_ERROR "flexlib supports only static builds (for now)")
 else()
   set(CORE_LIB_TYPE STATIC)
-endif(BUILD_SHARED_LIBS)
+endif(${PROJECT_NAME}_BUILD_SHARED_LIBS)
 
 set(ENABLE_CLING TRUE CACHE BOOL "ENABLE_CLING")
 message(STATUS "ENABLE_CLING=${ENABLE_CLING}")
@@ -108,8 +114,7 @@ message(STATUS "${FetchContent_conan_auto_install}_SOURCE_DIR = ${${FetchContent
 message(STATUS "${FetchContent_conan_auto_install}_BINARY_DIR = ${${FetchContent_conan_auto_install}_BINARY_DIR}")
 include(${${FetchContent_conan_auto_install}_SOURCE_DIR}/conan-auto-install.cmake)
 option(CONAN_AUTO_INSTALL "Let CMake call conan install automatically"
-  #OFF # disable by default cause llvm requires long build with CONAN_LLVM_SINGLE_THREAD_BUILD=1
-  ON
+  OFF
 )
 if (CONAN_AUTO_INSTALL)
   set(CONAN_PROFILE

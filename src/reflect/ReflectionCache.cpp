@@ -1,5 +1,6 @@
 ﻿#include "flexlib/reflect/ReflectionCache.hpp" // IWYU pragma: associated
 
+#if 0
 namespace reflection {
 
 ReflectionRegistry *ReflectionRegistry::instance;
@@ -15,3 +16,4 @@ ReflectionCXXRecordRegistry::ReflectionCXXRecordRegistry(const reflectionID &id/
 }
 
 } // namespace reflection
+#endif // 0

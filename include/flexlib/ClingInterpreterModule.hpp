@@ -96,6 +96,8 @@ public:
   /// without arguments
   cling::Interpreter::CompilationResult
     callFunctionByName(
+      /// \note function name can have namespace
+      /// example: "my_plugin::loadSettings"
       const std::string& funcName
       , void* argumentAsVoid
       , const std::string& codeToCastArgumentFromVoid
