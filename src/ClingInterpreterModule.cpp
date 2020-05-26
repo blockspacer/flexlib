@@ -138,7 +138,7 @@ cling::Interpreter::CompilationResult
       << "ERROR in cling interpreter: "
       << debug_id_
       << " ERROR while running cling code in path: "
-      << filePath.substr(0, 1000);
+      << filePath.substr(0, 10000);
   }
 
   return compilationResult;
@@ -184,7 +184,7 @@ cling::Interpreter::CompilationResult
       << "ERROR in cling interpreter: "
       << debug_id_
       << " ERROR while running cling code: "
-      << code.substr(0, 1000);
+      << code.substr(0, 10000);
   }
 
   return compilationResult;
@@ -249,7 +249,7 @@ cling::Interpreter::CompilationResult
       << "ERROR in cling interpreter: "
       << debug_id_
       << " ERROR while running cling code: "
-      << code_str.str().substr(0, 1000);
+      << code_str.str().substr(0, 10000);
   }
 
   return compilationResult;
@@ -289,7 +289,7 @@ cling::Interpreter::CompilationResult
       << "ERROR in cling interpreter: "
       << debug_id_
       << " ERROR while running cling code: "
-      << code.substr(0, 1000);
+      << code.substr(0, 10000);
   }
 
   return compilationResult;
