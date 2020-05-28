@@ -8,6 +8,8 @@
 
 #include "flexlib/reflect/TypeInfo.hpp"
 
+/// \todo improve based on p1240r1
+/// http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2019/p1240r1.pdf
 namespace reflection
 {
 
@@ -186,6 +188,8 @@ struct MethodInfo : public NamedDeclInfo
     bool isTemplate() const {return !tplParams.empty();}
 
     const clang::FunctionDecl* decl;
+
+    const clang::CXXMethodDecl* cxxDecl;
 };
 
 
@@ -271,6 +275,10 @@ struct ClassInfo : public NamedDeclInfo, public LocationInfo
     bool isAbstract = false;
     bool isUnion = false;
     bool hasDefinition = false;
+
+    uint64_t ASTRecordSize;
+
+    unsigned ASTRecordNonVirtualAlignment;
 
     const clang::CXXRecordDecl* decl;
 };

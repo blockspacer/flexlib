@@ -2,6 +2,9 @@
 
 #include <clang/AST/ASTContext.h>
 #include <clang/AST/DeclTemplate.h>
+#include <clang/AST/DeclTemplate.h>
+#include <clang/AST/RecordLayout.h>
+#include <clang/AST/Attr.h>
 
 #include <iostream>
 
@@ -159,6 +162,22 @@ ClassInfoPtr AstReflector::ReflectClass(const CXXRecordDecl* decl, NamespacesTre
             }
           );
       }
+    }
+
+    const clang::ASTRecordLayout& layout
+      = m_astContext->getASTRecordLayout(decl);
+
+    classInfo->ASTRecordSize
+      = layout.getSize().getQuantity();
+
+    classInfo->ASTRecordNonVirtualAlignment
+      = layout.getNonVirtualAlignment().getQuantity();
+
+    // If the class is final, then we know that the pointer points to an
+    // object of that type and can use the full alignment.
+    if (decl->hasAttr<clang::FinalAttr>()) {
+      classInfo->ASTRecordNonVirtualAlignment
+        = layout.getAlignment().getQuantity();
     }
 
     if (decl->hasDefinition())
@@ -359,10 +378,14 @@ void AstReflector::ReflectImplicitSpecialMembers(const CXXRecordDecl* decl, Clas
     }
 }
 
-MethodInfoPtr AstReflector::ReflectMethod(const FunctionDecl* decl, NamespacesTree* nsTree)
+MethodInfoPtr AstReflector::ReflectMethod(
+  const FunctionDecl* decl, NamespacesTree* nsTree)
 {
-    auto cxxDecl = llvm::dyn_cast_or_null<const clang::CXXMethodDecl>(decl);
-    MethodInfoPtr methodInfo = std::make_shared<MethodInfo>();
+    const clang::CXXMethodDecl* cxxDecl
+      = llvm::dyn_cast_or_null<const clang::CXXMethodDecl>(decl);
+
+    MethodInfoPtr methodInfo
+      = std::make_shared<MethodInfo>();
 
     const DeclContext* nsContext = decl->getEnclosingNamespaceContext();
 
@@ -414,6 +437,7 @@ MethodInfoPtr AstReflector::ReflectMethod(const FunctionDecl* decl, NamespacesTr
     methodInfo->accessType = ConvertAccessType(decl->getAccess());
     methodInfo->fullPrototype = EntityToString(decl, m_astContext);
     methodInfo->decl = decl;
+    methodInfo->cxxDecl = cxxDecl;
     methodInfo->returnType = TypeInfo::Create(decl->getReturnType(), m_astContext);
     methodInfo->isInlined = decl->isInlined();
     methodInfo->isDefined = decl->isDefined();
@@ -439,7 +463,7 @@ MethodInfoPtr AstReflector::ReflectMethod(const FunctionDecl* decl, NamespacesTr
     if (defDecl != nullptr)
         methodInfo->defLocation = GetLocation(defDecl, m_astContext);
 
-    DLOG(INFO) << "MethodParamInfo:"
+    DVLOG(9) << "MethodParamInfo: "
       << methodInfo->name << decl->parameters().size();
     for (const clang::ParmVarDecl* param: decl->parameters())
     {
@@ -448,8 +472,8 @@ MethodInfoPtr AstReflector::ReflectMethod(const FunctionDecl* decl, NamespacesTr
         paramInfo.type = TypeInfo::Create(param->getType(), m_astContext);
         paramInfo.fullDecl = EntityToString(param, m_astContext);
         paramInfo.decl = param;
-        DLOG(INFO) << "MethodParamInfo" << paramInfo.name;
-        DLOG(INFO) << "MethodParamInfo" << paramInfo.fullDecl;
+        DVLOG(9) << "MethodParamInfo " << paramInfo.name;
+        DVLOG(9) << "MethodParamInfo " << paramInfo.fullDecl;
         methodInfo->params.push_back(std::move(paramInfo));
     }
 

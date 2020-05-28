@@ -4,6 +4,8 @@
 
 #include <clang/AST/DeclCXX.h>
 
+/// \todo improve based on p1240r1
+/// http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2019/p1240r1.pdf
 namespace reflection
 {
 
@@ -235,10 +237,11 @@ public:
     {
         return m_typeDecl;
     }
-#if 0
+
+    /// \todo fixme
     bool canBeMoved() const
     {
-        struct Visitor /*: public boost::static_visitor<bool>*/
+        struct Visitor
         {
             Visitor(const TypeInfo* ti) : m_type(ti) {}
 
@@ -282,7 +285,7 @@ public:
 
         return std::visit(Visitor(this), m_type);
     }
-#endif // 0
+
     TypeDescr getTypeDescr() const;
 
     static TypeInfoPtr Create(const clang::QualType& qt, const clang::ASTContext* astContext);

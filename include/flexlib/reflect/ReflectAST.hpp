@@ -2,6 +2,8 @@
 
 #include "flexlib/reflect/ReflTypes.hpp"
 
+/// \todo improve based on p1240r1
+/// http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2019/p1240r1.pdf
 namespace reflection
 {
 
