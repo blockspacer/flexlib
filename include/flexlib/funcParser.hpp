@@ -42,6 +42,8 @@ std::vector<parsed_func> split_to_funcs(std::string const& inStr);
 
 } // namespace flexlib
 
+// DISABLE_DOCTEST: custom macro
+#if !defined(DISABLE_DOCTEST)
 DOCTEST_TEST_SUITE("extract_func_arg") {
   using namespace flexlib;
 
@@ -80,3 +82,4 @@ DOCTEST_TEST_SUITE("extract_func_arg") {
       , hh = 3)raw");
   }
 }
+#endif // DISABLE_DOCTEST

@@ -1,535 +1,141 @@
 ﻿#pragma once
 
-#if 0
-#include <cling/Interpreter/Interpreter.h>
-#include <cling/Interpreter/Value.h>
-#include "cling/Interpreter/CIFactory.h"
-#include "cling/Interpreter/Interpreter.h"
-#include "cling/Interpreter/InterpreterCallbacks.h"
-//#include "cling/Interpreter/IncrementalExecutor.h"
-//#include "cling/Interpreter/IncrementalParser.h"
-#include "cling/Interpreter/Transaction.h"
-#include "cling/Interpreter/Value.h"
-#include "cling/Interpreter/CValuePrinter.h"
-#include "cling/MetaProcessor/MetaProcessor.h"
-#include <cling/Utils/Casting.h>
-#include "cling/Interpreter/LookupHelper.h"
-#include "cling/Utils/AST.h"
-#include <cling/Interpreter/Interpreter.h>
-#include <cling/Interpreter/Value.h>
-#include "cling/Interpreter/CIFactory.h"
-#include "cling/Interpreter/Interpreter.h"
-#include "cling/Interpreter/InterpreterCallbacks.h"
-//#include "cling/Interpreter/IncrementalExecutor.h"
-//#include "cling/Interpreter/IncrementalParser.h"
-#include "cling/Interpreter/Transaction.h"
-#include "cling/Interpreter/Value.h"
-#include "cling/Interpreter/CValuePrinter.h"
-#include "cling/MetaProcessor/MetaProcessor.h"
-#include <cling/Utils/Casting.h>
-#include "cling/Interpreter/LookupHelper.h"
-#include "cling/Utils/AST.h"
-
-/*#include "clang/Basic/FileManager.h"
-#include "clang/Basic/LangOptions.h"
-#include "clang/Basic/SourceManager.h"
-#include "clang/Frontend/CompilerInstance.h"
-#include "clang/Lex/HeaderSearchOptions.h"
-#include "clang/Frontend/ASTUnit.h"
-#include "clang/Basic/DiagnosticCommonKinds.inc"*/
-#include "clang/Parse/Parser.h"
-#include "clang/AST/ASTContext.h"
-#include "clang/AST/Decl.h"
-#include "clang/AST/DeclBase.h"
-#include "clang/AST/DeclCXX.h"
-#include "clang/AST/PrettyPrinter.h"
-#include "clang/AST/Type.h"
-#include "clang/Frontend/CompilerInstance.h"
-#include "clang/Sema/Sema.h"
-/*#include "clang/Basic/FileManager.h"
-#include "clang/Basic/LangOptions.h"
-#include "clang/Basic/SourceManager.h"
-#include "clang/Frontend/CompilerInstance.h"
-#include "clang/Lex/HeaderSearchOptions.h"
-#include "clang/Frontend/ASTUnit.h"
-#include "clang/Basic/DiagnosticCommonKinds.inc"*/
-#include "clang/Parse/Parser.h"
-#include "clang/AST/ASTContext.h"
-#include "clang/AST/Decl.h"
-#include "clang/AST/DeclBase.h"
-#include "clang/AST/DeclCXX.h"
-#include "clang/AST/PrettyPrinter.h"
-#include "clang/AST/Type.h"
-
-/*
-#include "clang/AST/ASTContext.h"
-#include "clang/AST/DeclVisitor.h"
-#include "clang/AST/Decl.h"
-#include "clang/AST/DeclCXX.h"
-#include "clang/AST/DeclObjC.h"
-#include "clang/AST/Expr.h"
-#include "clang/AST/ExprCXX.h"
-#include "clang/AST/PrettyPrinter.h"
-#include "clang/Basic/Module.h"
-#include "llvm/Support/raw_ostream.h"*/
-
-#include "clang/Frontend/CompilerInstance.h"
-#include "clang/Sema/Sema.h"
-#include <clang/Lex/Lexer.h>
-#include <clang/Frontend/FrontendAction.h>
-#include <clang/Frontend/ASTConsumers.h>
-#include <clang/Frontend/CompilerInstance.h>
-#include <clang/Tooling/Tooling.h>
-#include <clang/Rewrite/Core/Rewriter.h>
-#include "clang/Driver/Options.h"
-#include "clang/AST/AST.h"
-#include "clang/AST/ASTContext.h"
-#include "clang/AST/ASTConsumer.h"
-#include "clang/AST/RecursiveASTVisitor.h"
-#include "clang/Frontend/ASTConsumers.h"
-#include "clang/Frontend/FrontendActions.h"
-#include "clang/Frontend/CompilerInstance.h"
-#include "clang/Tooling/CommonOptionsParser.h"
-#include "clang/Tooling/Tooling.h"
-#include "clang/Rewrite/Core/Rewriter.h"
-
-#include "clang/ASTMatchers/ASTMatchers.h"
-
-#include "clang/AST/ASTContext.h"
-#include "clang/ASTMatchers/ASTMatchFinder.h"
-#include "clang/ASTMatchers/ASTMatchers.h"
-#include "clang/ASTMatchers/ASTMatchersMacros.h"
-#include "clang/Basic/CharInfo.h"
-#include "clang/Basic/SourceManager.h"
-#include "clang/Frontend/CompilerInstance.h"
-#include "clang/Frontend/FrontendActions.h"
-#include "clang/Lex/Lexer.h"
-#include "clang/Lex/MacroArgs.h"
-#include "clang/Lex/PPCallbacks.h"
-#include "clang/Lex/Preprocessor.h"
-#include "clang/Tooling/CommonOptionsParser.h"
-#include "clang/Tooling/Refactoring.h"
-#include "clang/Tooling/Tooling.h"
-#include "clang/AST/AST.h"
-#include "clang/AST/ASTConsumer.h"
-#include "clang/AST/ASTContext.h"
-#include "clang/AST/AttrIterator.h"
-#include "clang/AST/Decl.h"
-#include "clang/AST/DeclCXX.h"
-#include "clang/AST/DeclarationName.h"
-#include "clang/AST/RecursiveASTVisitor.h"
-#include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/SourceLocation.h"
-#include "clang/Basic/SourceManager.h"
-#include "clang/Basic/TokenKinds.h"
-#include "clang/Frontend/CompilerInstance.h"
-#include "clang/Frontend/FrontendAction.h"
-#include "clang/Lex/Lexer.h"
-#include "clang/Rewrite/Core/RewriteBuffer.h"
-#include "clang/Rewrite/Core/Rewriter.h"
-#include "clang/Tooling/CommonOptionsParser.h"
-#include "clang/Tooling/Tooling.h"
-
-#include "llvm/Support/CommandLine.h"
-#include "llvm/Support/ErrorOr.h"
-#include "llvm/Support/LineIterator.h"
-#include "llvm/Support/MemoryBuffer.h"
-#include "llvm/Support/Path.h"
-#include "llvm/Support/TargetSelect.h"
-
-#include "llvm/Config/llvm-config.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/ExecutionEngine/ExecutionEngine.h"
-#include <llvm/Support/raw_os_ostream.h>
-
-#include "llvm/Config/llvm-config.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/ExecutionEngine/ExecutionEngine.h"
-
-// LLVM includes
-#include "llvm//Support/Path.h"
-#include "llvm/ADT/ArrayRef.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/ADT/Twine.h"
-#include "llvm/Support/Casting.h"
-#include "llvm/Support/CommandLine.h"
-#include "llvm/Support/raw_ostream.h"
-
-//#include "boost/unordered_map.hpp"
-//#include <boost/multi_index_container.hpp>
-//#include <boost/multi_index/member.hpp>
-//#include <boost/multi_index/ordered_index.hpp>
-//#include <boost/multi_index/hashed_index.hpp>
-//#include <boost/multi_index/sequenced_index.hpp>
-//#include <boost/multi_index/random_access_index.hpp>
-//#include <boost/multi_index/identity.hpp>
-
-
-#include <cling/Interpreter/Interpreter.h>
-#include <cling/Interpreter/Value.h>
-#include "cling/Interpreter/CIFactory.h"
-#include "cling/Interpreter/Interpreter.h"
-#include "cling/Interpreter/InterpreterCallbacks.h"
-//#include "cling/Interpreter/IncrementalExecutor.h"
-//#include "cling/Interpreter/IncrementalParser.h"
-#include "cling/Interpreter/Transaction.h"
-#include "cling/Interpreter/Value.h"
-#include "cling/Interpreter/CValuePrinter.h"
-#include "cling/MetaProcessor/MetaProcessor.h"
-#include <cling/Utils/Casting.h>
-#include "cling/Interpreter/LookupHelper.h"
-#include "cling/Utils/AST.h"
-#include <cling/Interpreter/Interpreter.h>
-#include <cling/Interpreter/Value.h>
-#include "cling/Interpreter/CIFactory.h"
-#include "cling/Interpreter/Interpreter.h"
-#include "cling/Interpreter/InterpreterCallbacks.h"
-//#include "cling/Interpreter/IncrementalExecutor.h"
-//#include "cling/Interpreter/IncrementalParser.h"
-#include "cling/Interpreter/Transaction.h"
-#include "cling/Interpreter/Value.h"
-#include "cling/Interpreter/CValuePrinter.h"
-#include "cling/MetaProcessor/MetaProcessor.h"
-#include <cling/Utils/Casting.h>
-#include "cling/Interpreter/LookupHelper.h"
-#include "cling/Utils/AST.h"
-
-/*#include "clang/Basic/FileManager.h"
-#include "clang/Basic/LangOptions.h"
-#include "clang/Basic/SourceManager.h"
-#include "clang/Frontend/CompilerInstance.h"
-#include "clang/Lex/HeaderSearchOptions.h"
-#include "clang/Frontend/ASTUnit.h"
-#include "clang/Basic/DiagnosticCommonKinds.inc"*/
-#include "clang/Parse/Parser.h"
-#include "clang/AST/ASTContext.h"
-#include "clang/AST/Decl.h"
-#include "clang/AST/DeclBase.h"
-#include "clang/AST/DeclCXX.h"
-#include "clang/AST/PrettyPrinter.h"
-#include "clang/AST/Type.h"
-#include "clang/Frontend/CompilerInstance.h"
-#include "clang/Sema/Sema.h"
-/*#include "clang/Basic/FileManager.h"
-#include "clang/Basic/LangOptions.h"
-#include "clang/Basic/SourceManager.h"
-#include "clang/Frontend/CompilerInstance.h"
-#include "clang/Lex/HeaderSearchOptions.h"
-#include "clang/Frontend/ASTUnit.h"
-#include "clang/Basic/DiagnosticCommonKinds.inc"*/
-#include "clang/Parse/Parser.h"
-#include "clang/AST/ASTContext.h"
-#include "clang/AST/Decl.h"
-#include "clang/AST/DeclBase.h"
-#include "clang/AST/DeclCXX.h"
-#include "clang/AST/PrettyPrinter.h"
-#include "clang/AST/Type.h"
-#include "clang/Frontend/CompilerInstance.h"
-#include "clang/Sema/Sema.h"
-#include <clang/Lex/Lexer.h>
-#include <clang/Frontend/FrontendAction.h>
-#include <clang/Frontend/ASTConsumers.h>
-#include <clang/Frontend/CompilerInstance.h>
-#include <clang/Tooling/Tooling.h>
-#include <clang/Rewrite/Core/Rewriter.h>
-#include "clang/Driver/Options.h"
-#include "clang/AST/AST.h"
-#include "clang/AST/ASTContext.h"
-#include "clang/AST/ASTConsumer.h"
-#include "clang/AST/RecursiveASTVisitor.h"
-#include "clang/Frontend/ASTConsumers.h"
-#include "clang/Frontend/FrontendActions.h"
-#include "clang/Frontend/CompilerInstance.h"
-#include "clang/Tooling/CommonOptionsParser.h"
-#include "clang/Tooling/Tooling.h"
-#include "clang/Rewrite/Core/Rewriter.h"
-
-#include "clang/ASTMatchers/ASTMatchers.h"
-
-#include "clang/AST/ASTContext.h"
-#include "clang/ASTMatchers/ASTMatchFinder.h"
-#include "clang/ASTMatchers/ASTMatchers.h"
-#include "clang/ASTMatchers/ASTMatchersMacros.h"
-#include "clang/Basic/CharInfo.h"
-#include "clang/Basic/SourceManager.h"
-#include "clang/Frontend/CompilerInstance.h"
-#include "clang/Frontend/FrontendActions.h"
-#include "clang/Lex/Lexer.h"
-#include "clang/Lex/MacroArgs.h"
-#include "clang/Lex/PPCallbacks.h"
-#include "clang/Lex/Preprocessor.h"
-#include "clang/Tooling/CommonOptionsParser.h"
-#include "clang/Tooling/Refactoring.h"
-#include "clang/Tooling/Tooling.h"
-#include "clang/AST/AST.h"
-#include "clang/AST/ASTConsumer.h"
-#include "clang/AST/ASTContext.h"
-#include "clang/AST/AttrIterator.h"
-#include "clang/AST/Decl.h"
-#include "clang/AST/DeclCXX.h"
-#include "clang/AST/DeclarationName.h"
-#include "clang/AST/RecursiveASTVisitor.h"
-#include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/SourceLocation.h"
-#include "clang/Basic/SourceManager.h"
-#include "clang/Basic/TokenKinds.h"
-#include "clang/Frontend/CompilerInstance.h"
-#include "clang/Frontend/FrontendAction.h"
-#include "clang/Lex/Lexer.h"
-#include "clang/Rewrite/Core/RewriteBuffer.h"
-#include "clang/Rewrite/Core/Rewriter.h"
-#include "clang/Tooling/CommonOptionsParser.h"
-#include "clang/Tooling/Tooling.h"
-
-#include "llvm/Support/CommandLine.h"
-#include "llvm/Support/ErrorOr.h"
-#include "llvm/Support/LineIterator.h"
-#include "llvm/Support/MemoryBuffer.h"
-#include "llvm/Support/Path.h"
-#include "llvm/Support/TargetSelect.h"
-
-#include "llvm/Config/llvm-config.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/ExecutionEngine/ExecutionEngine.h"
-#include <llvm/Support/raw_os_ostream.h>
-
-#include "llvm/Config/llvm-config.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/ExecutionEngine/ExecutionEngine.h"
-
-// LLVM includes
-#include "llvm//Support/Path.h"
-#include "llvm/ADT/ArrayRef.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/ADT/Twine.h"
-#include "llvm/Support/Casting.h"
-#include "llvm/Support/CommandLine.h"
-#include "llvm/Support/raw_ostream.h"
-
-#include <cling/Interpreter/Interpreter.h>
-#include <cling/Interpreter/Value.h>
-#include "cling/Interpreter/CIFactory.h"
-#include "cling/Interpreter/Interpreter.h"
-#include "cling/Interpreter/InterpreterCallbacks.h"
-//#include "cling/Interpreter/IncrementalExecutor.h"
-//#include "cling/Interpreter/IncrementalParser.h"
-#include "cling/Interpreter/Transaction.h"
-#include "cling/Interpreter/Value.h"
-#include "cling/Interpreter/CValuePrinter.h"
-#include "cling/MetaProcessor/MetaProcessor.h"
-#include <cling/Utils/Casting.h>
-#include "cling/Interpreter/LookupHelper.h"
-#include "cling/Utils/AST.h"
-#include <cling/Interpreter/Interpreter.h>
-#include <cling/Interpreter/Value.h>
-#include "cling/Interpreter/CIFactory.h"
-#include "cling/Interpreter/Interpreter.h"
-#include "cling/Interpreter/InterpreterCallbacks.h"
-//#include "cling/Interpreter/IncrementalExecutor.h"
-//#include "cling/Interpreter/IncrementalParser.h"
-#include "cling/Interpreter/Transaction.h"
-#include "cling/Interpreter/Value.h"
-#include "cling/Interpreter/CValuePrinter.h"
-#include "cling/MetaProcessor/MetaProcessor.h"
-#include <cling/Utils/Casting.h>
-#include "cling/Interpreter/LookupHelper.h"
-#include "cling/Utils/AST.h"
-
-/*#include "clang/Basic/FileManager.h"
-#include "clang/Basic/LangOptions.h"
-#include "clang/Basic/SourceManager.h"
-#include "clang/Frontend/CompilerInstance.h"
-#include "clang/Lex/HeaderSearchOptions.h"
-#include "clang/Frontend/ASTUnit.h"
-#include "clang/Basic/DiagnosticCommonKinds.inc"*/
-#include "clang/Parse/Parser.h"
-#include "clang/AST/ASTContext.h"
-#include "clang/AST/Decl.h"
-#include "clang/AST/DeclBase.h"
-#include "clang/AST/DeclCXX.h"
-#include "clang/AST/PrettyPrinter.h"
-#include "clang/AST/Type.h"
-#include "clang/Frontend/CompilerInstance.h"
-#include "clang/Sema/Sema.h"
-/*#include "clang/Basic/FileManager.h"
-#include "clang/Basic/LangOptions.h"
-#include "clang/Basic/SourceManager.h"
-#include "clang/Frontend/CompilerInstance.h"
-#include "clang/Lex/HeaderSearchOptions.h"
-#include "clang/Frontend/ASTUnit.h"
-#include "clang/Basic/DiagnosticCommonKinds.inc"*/
-#include "clang/Parse/Parser.h"
-#include "clang/AST/ASTContext.h"
-#include "clang/AST/Decl.h"
-#include "clang/AST/DeclBase.h"
-#include "clang/AST/DeclCXX.h"
-#include "clang/AST/PrettyPrinter.h"
-#include "clang/AST/Type.h"
-#include "clang/Frontend/CompilerInstance.h"
-#include "clang/Sema/Sema.h"
-#include <clang/Lex/Lexer.h>
-#include <clang/Frontend/FrontendAction.h>
-#include <clang/Frontend/ASTConsumers.h>
-#include <clang/Frontend/CompilerInstance.h>
-#include <clang/Tooling/Tooling.h>
-#include <clang/Rewrite/Core/Rewriter.h>
-#include "clang/Driver/Options.h"
-#include "clang/AST/AST.h"
-#include "clang/AST/ASTContext.h"
-#include "clang/AST/ASTConsumer.h"
-#include "clang/AST/RecursiveASTVisitor.h"
-#include "clang/Frontend/ASTConsumers.h"
-#include "clang/Frontend/FrontendActions.h"
-#include "clang/Frontend/CompilerInstance.h"
-#include "clang/Tooling/CommonOptionsParser.h"
-#include "clang/Tooling/Tooling.h"
-#include "clang/Rewrite/Core/Rewriter.h"
-
-#include "clang/ASTMatchers/ASTMatchers.h"
-
-#include "clang/AST/ASTContext.h"
-#include "clang/ASTMatchers/ASTMatchFinder.h"
-#include "clang/ASTMatchers/ASTMatchers.h"
-#include "clang/ASTMatchers/ASTMatchersMacros.h"
-#include "clang/Basic/CharInfo.h"
-#include "clang/Basic/SourceManager.h"
-#include "clang/Frontend/CompilerInstance.h"
-#include "clang/Frontend/FrontendActions.h"
-#include "clang/Lex/Lexer.h"
-#include "clang/Lex/MacroArgs.h"
-#include "clang/Lex/PPCallbacks.h"
-#include "clang/Lex/Preprocessor.h"
-#include "clang/Tooling/CommonOptionsParser.h"
-#include "clang/Tooling/Refactoring.h"
-#include "clang/Tooling/Tooling.h"
-#include "clang/AST/AST.h"
-#include "clang/AST/ASTConsumer.h"
-#include "clang/AST/ASTContext.h"
-#include "clang/AST/AttrIterator.h"
-#include "clang/AST/Decl.h"
-#include "clang/AST/DeclCXX.h"
-#include "clang/AST/DeclarationName.h"
-#include "clang/AST/RecursiveASTVisitor.h"
-#include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/SourceLocation.h"
-#include "clang/Basic/SourceManager.h"
-#include "clang/Basic/TokenKinds.h"
-#include "clang/Frontend/CompilerInstance.h"
-#include "clang/Frontend/FrontendAction.h"
-#include "clang/Lex/Lexer.h"
-#include "clang/Rewrite/Core/RewriteBuffer.h"
-#include "clang/Rewrite/Core/Rewriter.h"
-#include "clang/Tooling/CommonOptionsParser.h"
-#include "clang/Tooling/Tooling.h"
-
-#include "llvm/Support/CommandLine.h"
-#include "llvm/Support/ErrorOr.h"
-#include "llvm/Support/LineIterator.h"
-#include "llvm/Support/MemoryBuffer.h"
-#include "llvm/Support/Path.h"
-#include "llvm/Support/TargetSelect.h"
-
-#include "llvm/Config/llvm-config.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/ExecutionEngine/ExecutionEngine.h"
-#include <llvm/Support/raw_os_ostream.h>
-
-#include "llvm/Config/llvm-config.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/ExecutionEngine/ExecutionEngine.h"
-
-// LLVM includes
-#include "llvm//Support/Path.h"
-#include "llvm/ADT/ArrayRef.h"
-#include "llvm/ADT/StringRef.h"
-#include "llvm/ADT/Twine.h"
-#include "llvm/Support/Casting.h"
-#include "llvm/Support/CommandLine.h"
-#include "llvm/Support/raw_ostream.h"
-
-//#include "boost/unordered_map.hpp"
-//#include <boost/multi_index_container.hpp>
-//#include <boost/multi_index/member.hpp>
-//#include <boost/multi_index/ordered_index.hpp>
-//#include <boost/multi_index/hashed_index.hpp>
-//#include <boost/multi_index/sequenced_index.hpp>
-//#include <boost/multi_index/random_access_index.hpp>
-//#include <boost/multi_index/identity.hpp>
-
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <fstream>
-#include <streambuf>
-#include <thread>
-#include <mutex>
-#include <chrono>
-#include <vector>
-#include <functional>
-#include <unordered_map>
-#include <map>
-#include <condition_variable>
-#include <cstdio>
-#include <functional>
-#include <mutex>
-#include <queue>
-#include <string>
-#include <thread>
-#include <vector>
-//#include <filesystem>
-#include <memory>
-#include <numeric>
-#include <string_view>
-#include <optional>
-#include <condition_variable>
-// Standard includes
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <functional>
-#include <iterator>
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <fstream>
-#include <streambuf>
-#include <thread>
-#include <mutex>
-#include <chrono>
-#include <vector>
-#include <functional>
-#include <unordered_map>
-#include <map>
-#include <condition_variable>
-#include <cstdio>
-#include <functional>
-#include <mutex>
-#include <queue>
-#include <string>
-#include <thread>
-#include <vector>
-
-#include <experimental/filesystem>
-#endif
+#include "reflect/ReflectAST.hpp"
 
 #include <clang/AST/Decl.h>
 #include <clang/AST/DeclCXX.h>
+#include <clang/AST/DeclTemplate.h>
+#include <clang/AST/RecursiveASTVisitor.h>
+#include <clang/AST/ASTContext.h>
+#include <clang/AST/RecordLayout.h>
+#include <clang/ASTMatchers/ASTMatchFinder.h>
 #include <clang/Rewrite/Core/Rewriter.h>
+#include <clang/Lex/Preprocessor.h>
+
+#include <base/callback_forward.h>
+
+namespace MethodPrinter {
+
+namespace Forwarding {
+
+/// \note change only part after `1 <<`
+/// 1 << 0, // 00001 == 1
+/// 1 << 1, // 00010 == 2
+/// 1 << 2, // 00100 == 4
+/// 1 << 3, // 01000 == 8
+/// 1 << 4, // 10000 == 16
+enum Options
+{
+  NOTHING = 0
+  , EXPLICIT
+      = 1 << 1
+  , VIRTUAL
+      = 1 << 2
+  , CONSTEXPR
+      = 1 << 3
+  , STATIC
+      = 1 << 4
+  , RETURN_TYPE
+      = 1 << 5
+  , ALL
+      = MethodPrinter::Forwarding::Options::EXPLICIT
+        | MethodPrinter::Forwarding::Options::VIRTUAL
+        | MethodPrinter::Forwarding::Options::CONSTEXPR
+        | MethodPrinter::Forwarding::Options::STATIC
+        | MethodPrinter::Forwarding::Options::RETURN_TYPE
+};
+
+} // namespace Forwarding
+
+namespace Trailing {
+
+/// \note change only part after `1 <<`
+/// 1 << 0, // 00001 == 1
+/// 1 << 1, // 00010 == 2
+/// 1 << 2, // 00100 == 4
+/// 1 << 3, // 01000 == 8
+/// 1 << 4, // 10000 == 16
+enum Options
+{
+  NOTHING = 0
+  , CONST
+      = 1 << 1
+  , NOEXCEPT
+      = 1 << 2
+  , PURE
+      = 1 << 3
+  , DELETED
+      = 1 << 4
+  , DEFAULT
+      = 1 << 5
+  , BODY
+      = 1 << 6
+  , ALL
+      = MethodPrinter::Trailing::Options::CONST
+        | MethodPrinter::Trailing::Options::NOEXCEPT
+        | MethodPrinter::Trailing::Options::PURE
+        | MethodPrinter::Trailing::Options::DELETED
+        | MethodPrinter::Trailing::Options::DEFAULT
+        | MethodPrinter::Trailing::Options::BODY
+};
+
+} // namespace Trailing
+
+} // namespace MethodPrinter
 
 namespace clang_utils {
 
-//using namespace clang;
-//using namespace clang::driver;
-//using namespace clang::tooling;
-//using namespace llvm;
-//using namespace clang::ast_matchers;
-//using clang::tooling::CommonOptionsParser;
-//using clang::tooling::Replacement;
-//using llvm::StringRef;
+extern const char kSeparatorWhitespace[];
+
+extern const char kStructPrefix[];
+
+extern const char kRecordPrefix[];
+
+extern const char kSeparatorCommaAndWhitespace[];
+
+enum class StrJoin
+{
+  KEEP_LAST_SEPARATOR
+  // remove ending separator from NOT empty string
+  , STRIP_LAST_SEPARATOR
+  , TOTAL
+};
+
+std::string joinWithSeparator(
+  const std::vector<std::string>& input
+  , const std::string& separator
+  , StrJoin join_logic
+);
+
+std::string startHeaderGuard(
+  const std::string& guardName);
+
+std::string endHeaderGuard(
+  const std::string& guardName);
+
+// we want to generate file names based on parsed C++ types.
+// cause file names can not contain spaces ( \n\r)
+// and punctuations (,.:') we want to
+// replace special characters in filename to '_'
+// BEFORE:
+//   _typeclass_impl(
+//     typeclass_instance(
+//       target = "FireSpell",
+//       "MagicTemplated<std::string, int>,"
+//       "ParentTemplated_1<const char *>,"
+//       "ParentTemplated_2<const int &>")
+//   )
+// AFTER:
+//   FireSpell_MagicTemplated_std__string__int__ParentTemplated_1_const_char____ParentTemplated_2_const_int___.typeclass_instance.generated.hpp
+void normalizeFileName(std::string &in);
+
+void forEachDeclaredMethod(
+  const std::vector<reflection::MethodInfoPtr>& methods
+  , const base::RepeatingCallback<
+      void(
+        const reflection::MethodInfoPtr&
+        , size_t)
+    >& func);
 
 std::string printMethodDecl(const clang::Decl* decl,
   clang::CXXRecordDecl const * node, clang::CXXMethodDecl* fct);
@@ -537,5 +143,86 @@ std::string printMethodDecl(const clang::Decl* decl,
 void expandLocations(clang::SourceLocation& startLoc,
       clang::SourceLocation& endLoc,
       clang::Rewriter& rewriter_);
+
+// This function adapted from clang/lib/ARCMigrate/Transforms.cpp
+// Suppose you want to use clang::Rewiter to replace
+// int a = 3;  with "", but
+// without findSemiAfterLocation you will get ";"
+/// \usage
+/// {
+///   // gets us past the ';'.
+///   endLoc = findSemiAfterLocation(endLoc, rewriter);
+/// }
+/// /// \note if result.replacer is nullptr, than we will keep old code
+/// ReplaceText(
+///   clang::SourceRange(startLoc, endLoc)
+///   , replacement);
+clang::SourceLocation findSemiAfterLocation(
+  const clang::SourceLocation& loc
+  , clang::Rewriter& rewriter);
+
+/// \note prints up to return type
+/// (without method name, arguments or body)
+/// \note order matters:
+/// explicit virtual constexpr static returnType
+///   methodName(...) {}
+/// \note to disallow some options you can pass
+/// something like:
+/// (MethodPrinter::Options::ALL
+///  & ~MethodPrinter::Options::EXPLICIT
+///  & ~MethodPrinter::Options::VIRTUAL)
+/// \note to allow only some options you can pass
+/// something like:
+/// MethodPrinter::Options::NOTHING
+/// | MethodPrinter::Options::CONST
+/// | MethodPrinter::Options::NOEXCEPT);
+std::string printMethodForwarding(
+  const reflection::MethodInfoPtr& methodInfo
+  , const std::string& separator = kSeparatorWhitespace
+  // what method printer is allowed to print
+  // |options| is a bitmask of |MethodPrinter::Options|
+  , int options = MethodPrinter::Forwarding::Options::ALL
+);
+
+/// \note order matters:
+/// methodName(...)
+/// const noexcept override final [=0] [=deleted] [=default]
+/// {}
+/// \note to disallow some options you can pass
+/// something like:
+/// (MethodPrinter::Options::ALL
+///  & ~MethodPrinter::Options::EXPLICIT
+///  & ~MethodPrinter::Options::VIRTUAL)
+/// \note to allow only some options you can pass
+/// something like:
+/// MethodPrinter::Options::NOTHING
+/// | MethodPrinter::Options::CONST
+/// | MethodPrinter::Options::NOEXCEPT);
+std::string printMethodTrailing(
+  const reflection::MethodInfoPtr& methodInfo
+  , const std::string& separator = kSeparatorWhitespace
+  // what method printer is allowed to print
+  // |options| is a bitmask of |MethodPrinter::Trailing::Options|
+  , int options = MethodPrinter::Trailing::Options::ALL
+);
+
+std::string extractTypeName(
+  const std::string& input);
+
+// wrap string into `#include "..."` or `#include <...>`
+std::string buildIncludeDirective(
+  const std::string& inStr
+  , const std::string& quote = R"raw(")raw");
+
+std::string forwardMethodParamNames(
+  const std::vector<reflection::MethodParamInfo>& params);
+
+// replaces clang matchResult with |replacement| in source code
+void replaceWith(
+  clang::Rewriter& rewriter
+  , const clang::Decl* decl
+  , const clang::ast_matchers::MatchFinder::MatchResult& matchResult
+  , const std::string& replacement = ""
+  , const bool skip_rewrite_not_main_file = false);
 
 } // namespace clang_utils
