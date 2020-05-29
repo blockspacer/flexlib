@@ -242,11 +242,12 @@ if(${ROOT_PROJECT_NAME}_BUILD_TESTS)
   tests_add_executable(${ROOT_PROJECT_NAME}-pimpl
     "${pimpl_deps}" "${CATCH2_TEST_ARGS}" "${test_main_catch}")
 
-  set ( doctest_deps
-    doctest.test.cpp
-  )
-  tests_add_executable(${ROOT_PROJECT_NAME}-doctest
-    "${doctest_deps}" "${DOCTEST_TEST_ARGS}" "${test_main_doctest}")
+  # TODO: fix doctest https://github.com/onqtam/doctest/issues/382
+  #set ( doctest_deps
+  #  doctest.test.cpp
+  #)
+  #tests_add_executable(${ROOT_PROJECT_NAME}-doctest
+  #  "${doctest_deps}" "${DOCTEST_TEST_ARGS}" "${test_main_doctest}")
 
   set ( gmock_deps
     gmock.test.cpp

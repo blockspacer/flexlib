@@ -191,6 +191,7 @@ int main(int argc, char* argv[]) {
     // query flags (and --exit) rely on this
     if (ctx.shouldExit()) {
       // propagate the result of the tests
+      LOG(INFO) << "got shouldExit for doctest tests...";
       return doctest_result;
     }
 
