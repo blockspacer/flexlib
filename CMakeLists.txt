@@ -274,6 +274,7 @@ list(APPEND USED_3DPARTY_LIBS
 )
 
 list(APPEND USED_3DPARTY_LIBS
+  CONAN_PKG::doctest
   CONAN_PKG::basis
   CONAN_PKG::clang_folly_conan
   CONAN_PKG::boost

@@ -21,6 +21,9 @@ endif()
 
 set( GTEST_TEST_ARGS --gtest_shuffle)
 
+# see https://github.com/onqtam/doctest/blob/master/doc/markdown/commandline.md
+set( DOCTEST_TEST_ARGS --duration=1)
+
 add_library(${ROOT_PROJECT_NAME}-catch2-root INTERFACE)
 target_include_directories( ${ROOT_PROJECT_NAME}-catch2-root SYSTEM INTERFACE
   ${CONAN_CATCH2_ROOT}/include/catch2 )
@@ -33,6 +36,7 @@ list(APPEND TESTS_3DPARTY_LIBS
     #CONAN_PKG::cling_conan
     #FakeIt
     CONAN_PKG::gtest
+    CONAN_PKG::doctest
     CONAN_PKG::FakeIt
     CONAN_PKG::catch2
     ${ROOT_PROJECT_NAME}-catch2-root # so FakeIt will be able to see 'catch.hpp'
@@ -155,6 +159,34 @@ target_link_libraries(${test_main_catch} PUBLIC
 target_compile_definitions( ${test_main_catch} PUBLIC
   "-DUSE_CATCH_TEST=1" )
 
+
+set(test_main_doctest "${ROOT_PROJECT_NAME}-test_main_doctest")
+add_library( ${test_main_doctest} OBJECT
+  main.cpp
+  #${${ROOT_PROJECT_NAME}_SRCS} # all source files  of root project without main.cpp
+  #${THIRDPARTY_SOURCES}
+  testsCommon.h # include in IDE
+  )
+
+set_property(TARGET ${test_main_doctest} PROPERTY CXX_STANDARD 17)
+
+# ensure that dependencies build before <target> does.
+add_dependencies(${test_main_doctest} ${ROOT_PROJECT_LIB})
+
+set_test_compile_options( ${test_main_doctest} )
+
+target_link_libraries(${test_main_doctest} PUBLIC
+  # 3dparty libs
+  ${TESTS_3DPARTY_LIBS}
+  # system libs
+  ${USED_SYSTEM_LIBS}
+  # main project lib
+  ${ROOT_PROJECT_LIB}
+)
+
+target_compile_definitions( ${test_main_doctest} PUBLIC
+  "-DUSE_DOCTEST_TEST=1" )
+
 set(test_main_gtest "${ROOT_PROJECT_NAME}-test_main_gtest")
 add_library( ${test_main_gtest} OBJECT
   main.cpp
@@ -209,6 +241,12 @@ if(${ROOT_PROJECT_NAME}_BUILD_TESTS)
   )
   tests_add_executable(${ROOT_PROJECT_NAME}-pimpl
     "${pimpl_deps}" "${CATCH2_TEST_ARGS}" "${test_main_catch}")
+
+  set ( doctest_deps
+    doctest.test.cpp
+  )
+  tests_add_executable(${ROOT_PROJECT_NAME}-doctest
+    "${doctest_deps}" "${DOCTEST_TEST_ARGS}" "${test_main_doctest}")
 
   set ( gmock_deps
     gmock.test.cpp

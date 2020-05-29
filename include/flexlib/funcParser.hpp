@@ -4,6 +4,8 @@
 #include <vector>
 #include <map>
 
+#include <basis/doctest_util.hpp>
+
 namespace flexlib {
 
 // EXAMPLE:
@@ -39,3 +41,42 @@ functionArgument extract_func_arg(std::string const& inStr);
 std::vector<parsed_func> split_to_funcs(std::string const& inStr);
 
 } // namespace flexlib
+
+DOCTEST_TEST_SUITE("extract_func_arg") {
+  using namespace flexlib;
+
+  DOCTEST_TEST_CASE("extract_func_arg 1") {
+    functionArgument arg_parsed
+      = extract_func_arg(R"raw(a=1)raw");
+    DOCTEST_CHECK(arg_parsed.name_ == "a");
+    DOCTEST_CHECK(arg_parsed.value_ == "1");
+  }
+  DOCTEST_TEST_CASE("extract_func_arg 2") {
+    functionArgument arg_parsed
+      = extract_func_arg(R"raw(b)raw");
+    DOCTEST_CHECK(arg_parsed.name_.empty());
+    DOCTEST_CHECK(arg_parsed.value_ == "b");
+  }
+  DOCTEST_TEST_CASE("extract_func_arg 3") {
+    functionArgument arg_parsed
+      = extract_func_arg(R"raw(
+        c  =  3)raw");
+    /// \note will contain spaces (' ')
+    /// both in argument name and argument value
+    DOCTEST_CHECK(arg_parsed.name_ == R"raw(
+        c  )raw");
+    DOCTEST_CHECK(arg_parsed.value_ == "  3");
+  }
+  DOCTEST_TEST_CASE("extract_func_arg 4") {
+    functionArgument arg_parsed
+      = extract_func_arg(R"raw(a=1, , ,
+      asd , db = "32"
+      , hh = 3)raw");
+    DOCTEST_CHECK(arg_parsed.name_ == "a");
+    /// \note will parse only first argument
+    /// (just splits string by first '=')
+    DOCTEST_CHECK(arg_parsed.value_ == R"raw(1, , ,
+      asd , db = "32"
+      , hh = 3)raw");
+  }
+}

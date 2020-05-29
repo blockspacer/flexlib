@@ -153,6 +153,8 @@ class flexlib_conan_project(conan_build_helper.CMakePackage):
           self.requires("gtest/[>=1.8.0]@bincrafters/stable")
           self.requires("FakeIt/[>=2.0.4]@gasuketsu/stable")
 
+      self.requires("doctest/[>=2.3.8]")
+
       if not self.options.use_system_boost:
           self.requires("boost/1.71.0@dev/stable")
 
@@ -221,6 +223,12 @@ class flexlib_conan_project(conan_build_helper.CMakePackage):
         cmake = CMake(self)
         cmake.parallel = True
         cmake.verbose = True
+
+        no_doctest = (str(self.settings.build_type).lower() != "debug"
+          and str(self.settings.build_type).lower() != "relwithdebinfo")
+        if no_doctest:
+          cmake.definitions["DOCTEST_CONFIG_DISABLE"] = '1'
+          self.output.info('Disabled DOCTEST')
 
         cmake.definitions["CONAN_AUTO_INSTALL"] = 'OFF'
 

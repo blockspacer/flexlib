@@ -1,7 +1,7 @@
 #pragma once
 
-#if !defined(USE_CATCH_TEST) && !defined(USE_GTEST_TEST)
-#warning "use either GTEST or CATCH"
+#if !defined(USE_CATCH_TEST) && !defined(USE_GTEST_TEST) && !defined(USE_DOCTEST_TEST)
+#warning "use either GTEST or CATCH or DOCTEST"
 // default to gtest
 #define USE_GTEST_TEST 1
 #endif // !defined(USE_CATCH_TEST) && !defined(USE_GTEST_TEST)
@@ -16,8 +16,10 @@ using namespace ::Catch::Matchers;
 #elif defined(USE_GTEST_TEST)
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#elif defined(USE_DOCTEST_TEST)
+#include "basis/doctest_util.hpp"
 #else
-#error "use either GTEST or CATCH"
+#error "use either DOCTEST or GTEST or CATCH"
 #endif // USE_GTEST_TEST && USE_CATCH_TEST
 
 #if defined(USE_GTEST_TEST) && defined(USE_CATCH_TEST)

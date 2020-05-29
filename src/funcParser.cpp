@@ -15,9 +15,12 @@ static const char kArgumentAssign = '=';
 functionArgument extract_func_arg(std::string const& inStr) {
   std::string arg_value_ = inStr;
   std::string arg_name_ = "";
+  // split string by assign ('=')
   auto delim_pos = inStr.find(kArgumentAssign);
   if(delim_pos != std::string::npos) {
     arg_name_ = inStr.substr(0, delim_pos);
+    // argument name is everything before assign ('=')
+    /// \note empty argument name results in empty argument value
     if(!arg_name_.empty()) {
       assert(arg_name_.length() + 1 <= inStr.length());
       arg_value_ = inStr.substr(arg_name_.length() + 1, inStr.length());

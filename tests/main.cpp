@@ -45,7 +45,7 @@ int runCatchTests(int argc, char* const argv[]) {
 }
 #endif // USE_CATCH_TEST
 
-#if defined(USE_CATCH_TEST) || defined(GTEST_NO_SUITE)
+#if defined(USE_DOCTEST_TEST) || defined(USE_CATCH_TEST) || defined(GTEST_NO_SUITE)
 static inline void initI18n()
 {
   /// \todo InitializeICUWithFileDescriptor
@@ -144,10 +144,10 @@ static inline void initCommandLine(int argc, char* argv[])
   // base::TaskScheduler::CreateAndStartWithDefaultParams("MainThreadPool");
   // DCHECK(base::TaskScheduler::GetInstance());
 }
-#endif // USE_CATCH_TEST || defined(GTEST_NO_SUITE)
+#endif // USE_DOCTEST_TEST || USE_CATCH_TEST || defined(GTEST_NO_SUITE)
 
 int main(int argc, char* argv[]) {
-#if defined(USE_CATCH_TEST) || defined(GTEST_NO_SUITE)
+#if defined(USE_DOCTEST_TEST) || defined(USE_CATCH_TEST) || defined(GTEST_NO_SUITE)
   initCommandLine(argc, argv);
 
   // This object instance is required (for example,
@@ -177,7 +177,27 @@ int main(int argc, char* argv[]) {
       LOG(INFO) << "shutdown...";
     }
   ));
-#endif // USE_CATCH_TEST || defined(GTEST_NO_SUITE)
+#endif // USE_DOCTEST_TEST || USE_CATCH_TEST || defined(GTEST_NO_SUITE)
+
+#if defined(USE_DOCTEST_TEST)
+  {
+    doctest::Context ctx
+      = doctest_util::initDoctest(argc, argv);
+
+    LOG(INFO) << "created doctest context...";
+
+    // run test cases unless with --no-run
+    const int doctest_result = ctx.run();
+    // query flags (and --exit) rely on this
+    if (ctx.shouldExit()) {
+      // propagate the result of the tests
+      return doctest_result;
+    }
+
+    LOG(INFO) << "quitting doctest tests...";
+    return doctest_result;
+  }
+#endif // USE_DOCTEST_TEST
 
 #if defined(USE_CATCH_TEST)
   // If the TEST macro is defined to be true,
