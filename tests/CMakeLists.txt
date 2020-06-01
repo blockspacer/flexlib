@@ -159,7 +159,6 @@ target_link_libraries(${test_main_catch} PUBLIC
 target_compile_definitions( ${test_main_catch} PUBLIC
   "-DUSE_CATCH_TEST=1" )
 
-
 set(test_main_doctest "${ROOT_PROJECT_NAME}-test_main_doctest")
 add_library( ${test_main_doctest} OBJECT
   main.cpp
@@ -236,12 +235,6 @@ option(${ROOT_PROJECT_NAME}_BUILD_TESTS "Enable tests" ON)
 if(${ROOT_PROJECT_NAME}_BUILD_TESTS)
   message( "${PROJECT_NAME} testing enabled" )
 
-  set ( pimpl_deps
-    pimpl.test.cpp
-  )
-  tests_add_executable(${ROOT_PROJECT_NAME}-pimpl
-    "${pimpl_deps}" "${CATCH2_TEST_ARGS}" "${test_main_catch}")
-
   # TODO: fix doctest https://github.com/onqtam/doctest/issues/382
   #set ( doctest_deps
   #  doctest.test.cpp
@@ -263,16 +256,13 @@ if(${ROOT_PROJECT_NAME}_BUILD_TESTS)
 endif()
 
 #add_to_tests_list(utils)
-#add_to_tests_list(pimpl)
 
 #tests_add_executable(check_all ${UNIT_TEST_SOURCE_LIST} ${GTEST_TEST_ARGS})
 #message(FATAL_ERROR ${UNIT_TEST_SOURCE_LIST})
 
-# "pimpl" is one of test program names
-
 message(STATUS "flexlib: copying ${CMAKE_CURRENT_SOURCE_DIR}/data")
-# "pimpl" is one of test program names
-add_custom_command( TARGET ${ROOT_PROJECT_NAME}-pimpl POST_BUILD
+# "gmock" is one of test program names
+add_custom_command( TARGET ${ROOT_PROJECT_NAME}-gmock POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy_directory
                         ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_BINARY_DIR}/bin/$<CONFIG>/tests/data )
 

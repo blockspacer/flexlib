@@ -5,48 +5,17 @@
 #include "utils.hpp"
 
 #include <base/macros.h>
-#include <base/callback_forward.h>
+#include <base/callback.h>
 #include <base/logging.h>
-#include <base/memory/ref_counted.h>
-#include <base/sequence_checker.h>
-#include <base/threading/sequenced_task_runner_handle.h>
-#include <base/time/default_tick_clock.h>
-#include <base/time/time.h>
-#include <base/trace_event/memory_dump_provider.h>
-#include <base/trace_event/memory_usage_estimator.h>
-#include <base/compiler_specific.h>
-#include <base/synchronization/atomic_flag.h>
 
 #include <cling/Interpreter/Interpreter.h>
 #include <cling/Interpreter/Value.h>
-#include <cling/Interpreter/CIFactory.h>
-#include <cling/Interpreter/Interpreter.h>
 #include <cling/Interpreter/InterpreterCallbacks.h>
-#include <cling/Interpreter/Transaction.h>
-#include <cling/Interpreter/Value.h>
-#include <cling/Interpreter/CValuePrinter.h>
 #include <cling/MetaProcessor/MetaProcessor.h>
-#include <cling/Utils/Casting.h>
-#include <cling/Interpreter/LookupHelper.h>
-#include <cling/Utils/AST.h>
-#include <cling/Interpreter/Interpreter.h>
-#include <cling/Interpreter/Value.h>
-#include <cling/Interpreter/CIFactory.h>
-#include <cling/Interpreter/Interpreter.h>
-#include <cling/Interpreter/InterpreterCallbacks.h>
-#include <cling/Interpreter/Transaction.h>
-#include <cling/Interpreter/Value.h>
-#include <cling/Interpreter/CValuePrinter.h>
-#include <cling/MetaProcessor/MetaProcessor.h>
-#include <cling/Utils/Casting.h>
-#include <cling/Interpreter/LookupHelper.h>
-#include <cling/Utils/AST.h>
 
 #include <string>
 #include <vector>
 #include <memory>
-#include <map>
-#include <condition_variable>
 
 namespace cling_utils {
 

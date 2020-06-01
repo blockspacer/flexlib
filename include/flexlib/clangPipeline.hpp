@@ -20,20 +20,11 @@
 #include <clang/Frontend/FrontendActions.h>
 #include <clang/Basic/SourceManager.h>
 #include <clang/Tooling/Tooling.h>
-#include <clang/Rewrite/Core/Rewriter.h>
 
 #include <base/macros.h>
-#include <base/callback_forward.h>
+#include <base/callback.h>
 #include <base/logging.h>
-#include <base/memory/ref_counted.h>
-#include <base/sequence_checker.h>
-#include <base/threading/sequenced_task_runner_handle.h>
-#include <base/time/default_tick_clock.h>
-#include <base/time/time.h>
-#include <base/trace_event/memory_dump_provider.h>
-#include <base/trace_event/memory_usage_estimator.h>
-#include <base/compiler_specific.h>
-#include <base/synchronization/atomic_flag.h>
+#include <base/containers/flat_map.h>
 
 namespace clang_utils {
 

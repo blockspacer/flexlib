@@ -12,7 +12,9 @@
 #include <clang/Rewrite/Core/Rewriter.h>
 #include <clang/Lex/Preprocessor.h>
 
-#include <base/callback_forward.h>
+#include <base/callback.h>
+
+#include <string>
 
 namespace MethodPrinter {
 
