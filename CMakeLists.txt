@@ -273,16 +273,13 @@ list(APPEND USED_3DPARTY_LIBS
   ${build_util_LIB}
 )
 
-if(NOT TARGET CONAN_PKG::basis)
-  message(FATAL_ERROR "Use basis from conan")
+find_package(basis REQUIRED)
+if(${basis_HEADER_DIR} STREQUAL "")
+  message(FATAL_ERROR "unable to find basis_HEADER_DIR")
 endif()
-set(basis CONAN_PKG::basis)
-if(basis_LOCAL_BUILD)
-  set(basis basis)
-endif(basis_LOCAL_BUILD)
 
 list(APPEND USED_3DPARTY_LIBS
-  ${basis}
+  ${basis_LIB}
   CONAN_PKG::doctest
   CONAN_PKG::clang_folly_conan
   CONAN_PKG::boost

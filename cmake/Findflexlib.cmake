@@ -12,8 +12,26 @@ find_package(Cling)
 
 list(REMOVE_AT CMAKE_MODULE_PATH -1)
 
-# uses Config.cmake or a -config.cmake file
-# see https://gitlab.kitware.com/cmake/community/wikis/doc/tutorials/How-to-create-a-ProjectConfig.cmake-file
-# BELOW MUST BE EQUAL TO find_package(... CONFIG REQUIRED)
-# NOTE: find_package(CONFIG) not supported with EMSCRIPTEN, so use include()
-include(${CMAKE_CURRENT_LIST_DIR}/cmake/flexlib-config.cmake)
+if(NOT TARGET CONAN_PKG::flexlib)
+  message(FATAL_ERROR "Use flexlib from conan")
+endif()
+set(flexlib_LIB CONAN_PKG::flexlib)
+# conan package has '/include' dir
+set(flexlib_HEADER_DIR
+  ${CONAN_FLEXLIB_ROOT}/include
+)
+if(flexlib_LOCAL_BUILD)
+  # name of created target
+  set(flexlib_LIB flexlib)
+  # no '/include' dir on local build
+  set(flexlib_HEADER_DIR
+    ${CONAN_FLEXLIB_ROOT}/include
+  )
+else()
+  # uses Config.cmake or a -config.cmake file
+  # see https://gitlab.kitware.com/cmake/community/wikis/doc/tutorials/How-to-create-a-ProjectConfig.cmake-file
+  # BELOW MUST BE EQUAL TO find_package(... CONFIG REQUIRED)
+  # NOTE: find_package(CONFIG) not supported with EMSCRIPTEN, so use include()
+  include(${CMAKE_CURRENT_LIST_DIR}/cmake/flexlib-config.cmake)
+endif(flexlib_LOCAL_BUILD)
+message(STATUS "flexlib_HEADER_DIR=${flexlib_HEADER_DIR}")
