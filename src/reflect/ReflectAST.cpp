@@ -145,6 +145,8 @@ TypedefInfoPtr AstReflector::ReflectTypedef(
 ClassInfoPtr AstReflector::ReflectClass(
   const CXXRecordDecl* decl, NamespacesTree* nsTree, bool recursive)
 {
+  DCHECK(decl);
+
   const DeclContext* nsContext
     = decl->getEnclosingNamespaceContext();
 
@@ -190,25 +192,38 @@ ClassInfoPtr AstReflector::ReflectClass(
     }
   }
 
-  DCHECK(m_astContext);
-  const clang::ASTRecordLayout& layout
-    = m_astContext->getASTRecordLayout(decl);
-
-  classInfo->ASTRecordSize
-    = layout.getSize().getQuantity();
-
-  classInfo->ASTRecordNonVirtualAlignment
-    = layout.getNonVirtualAlignment().getQuantity();
-
-  // If the class is final, then we know that the pointer points to an
-  // object of that type and can use the full alignment.
-  if (decl->hasAttr<clang::FinalAttr>()) {
-    classInfo->ASTRecordNonVirtualAlignment
-      = layout.getAlignment().getQuantity();
-  }
-
   if (decl->hasDefinition())
   {
+    DCHECK(m_astContext);
+
+    DCHECK(!decl->isInvalidDecl());
+
+    DCHECK(llvm::dyn_cast_or_null<clang::RecordDecl>(decl));
+
+    FullSourceLoc fullLocation
+      = m_astContext->getFullLoc(decl->getLocStart());
+    DCHECK(fullLocation.isValid());
+
+    /// Get or compute information about the layout
+    /// of the specified record (struct/union/class),
+    /// which indicates its size and field position information.
+    const clang::ASTRecordLayout& layout
+      = m_astContext->getASTRecordLayout(decl);
+
+    classInfo->ASTRecordSize
+      = layout.getSize().getQuantity();
+
+    classInfo->ASTRecordNonVirtualAlignment
+      = layout.getNonVirtualAlignment().getQuantity();
+
+    // If the class is final, then we know that the pointer points to an
+    // object of that type and can use the full alignment.
+    if (decl->hasAttr<clang::FinalAttr>()) {
+      classInfo->ASTRecordNonVirtualAlignment
+        = layout.getAlignment().getQuantity();
+    }
+
+    DCHECK(nsTree);
     ReflectImplicitSpecialMembers(decl, classInfo.get(), nsTree);
 
     for (auto methodDecl : decl->methods())
@@ -306,6 +321,9 @@ void AstReflector::ReflectImplicitSpecialMembers(
   , ClassInfo* classInfo
   , NamespacesTree* nsTree)
 {
+  DCHECK(decl);
+  DCHECK(classInfo);
+
   auto setupImplicitMember
     = [this, decl, classInfo]
       (const std::string& name)
