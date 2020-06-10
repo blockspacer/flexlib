@@ -33,10 +33,11 @@ get_target_property (FakeIt_IMPORTED_LOCATION CONAN_PKG::FakeIt INTERFACE_INCLUD
 message( "CONAN_PKG::FakeIt=${FakeIt_IMPORTED_LOCATION}" )
 
 list(APPEND TESTS_3DPARTY_LIBS
-    #CONAN_PKG::cling_conan
+    CONAN_PKG::cling_conan
     #FakeIt
     CONAN_PKG::gtest
-    CONAN_PKG::doctest
+    #TODO: doctest
+    #CONAN_PKG::doctest
     CONAN_PKG::FakeIt
     CONAN_PKG::catch2
     ${ROOT_PROJECT_NAME}-catch2-root # so FakeIt will be able to see 'catch.hpp'
@@ -54,6 +55,9 @@ macro(add_to_tests_list source_list)
 endmacro()
 
 macro(set_test_compile_options target)
+  target_compile_options(${target} PRIVATE
+    -frtti)
+
   target_compile_options(${target} PRIVATE
               $<$<CXX_COMPILER_ID:MSVC>:
               /W3 # Set warning level
@@ -142,6 +146,10 @@ add_library( ${test_main_catch} OBJECT
 
 set_property(TARGET ${test_main_catch} PROPERTY CXX_STANDARD 17)
 
+# FIX for undefined reference to `typeinfo for clang::Decl'
+target_compile_options(${test_main_catch} PRIVATE
+  -frtti)
+
 # ensure that dependencies build before <target> does.
 add_dependencies(${test_main_catch} ${ROOT_PROJECT_LIB})
 
@@ -159,32 +167,37 @@ target_link_libraries(${test_main_catch} PUBLIC
 target_compile_definitions( ${test_main_catch} PUBLIC
   "-DUSE_CATCH_TEST=1" )
 
-set(test_main_doctest "${ROOT_PROJECT_NAME}-test_main_doctest")
-add_library( ${test_main_doctest} OBJECT
-  main.cpp
-  #${${ROOT_PROJECT_NAME}_SRCS} # all source files  of root project without main.cpp
-  #${THIRDPARTY_SOURCES}
-  testsCommon.h # include in IDE
-  )
-
-set_property(TARGET ${test_main_doctest} PROPERTY CXX_STANDARD 17)
-
-# ensure that dependencies build before <target> does.
-add_dependencies(${test_main_doctest} ${ROOT_PROJECT_LIB})
-
-set_test_compile_options( ${test_main_doctest} )
-
-target_link_libraries(${test_main_doctest} PUBLIC
-  # 3dparty libs
-  ${TESTS_3DPARTY_LIBS}
-  # system libs
-  ${USED_SYSTEM_LIBS}
-  # main project lib
-  ${ROOT_PROJECT_LIB}
-)
-
-target_compile_definitions( ${test_main_doctest} PUBLIC
-  "-DUSE_DOCTEST_TEST=1" )
+# TODO: DOCTEST SUPPORT
+#set(test_main_doctest "${ROOT_PROJECT_NAME}-test_main_doctest")
+#add_library( ${test_main_doctest} OBJECT
+#  main.cpp
+#  #${${ROOT_PROJECT_NAME}_SRCS} # all source files  of root project without main.cpp
+#  #${THIRDPARTY_SOURCES}
+#  testsCommon.h # include in IDE
+#  )
+#
+#set_property(TARGET ${test_main_doctest} PROPERTY CXX_STANDARD 17)
+#
+# FIX for undefined reference to `typeinfo for clang::Decl'
+#target_compile_options(${test_main_doctest} PRIVATE
+#  -frtti)
+#
+## ensure that dependencies build before <target> does.
+#add_dependencies(${test_main_doctest} ${ROOT_PROJECT_LIB})
+#
+#set_test_compile_options( ${test_main_doctest} )
+#
+#target_link_libraries(${test_main_doctest} PUBLIC
+#  # 3dparty libs
+#  ${TESTS_3DPARTY_LIBS}
+#  # system libs
+#  ${USED_SYSTEM_LIBS}
+#  # main project lib
+#  ${ROOT_PROJECT_LIB}
+#)
+#
+#target_compile_definitions( ${test_main_doctest} PUBLIC
+#  "-DUSE_DOCTEST_TEST=1" )
 
 set(test_main_gtest "${ROOT_PROJECT_NAME}-test_main_gtest")
 add_library( ${test_main_gtest} OBJECT
@@ -195,6 +208,10 @@ add_library( ${test_main_gtest} OBJECT
   )
 
 set_property(TARGET ${test_main_gtest} PROPERTY CXX_STANDARD 17)
+
+# FIX for undefined reference to `typeinfo for clang::Decl'
+target_compile_options(${test_main_gtest} PRIVATE
+  -frtti)
 
 # ensure that dependencies build before <target> does.
 add_dependencies(${test_main_gtest} ${ROOT_PROJECT_LIB})

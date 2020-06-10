@@ -56,3 +56,25 @@ list(APPEND flexlib_SOURCES
   ${flexlib_src_DIR}/ctp_registry.cpp
   ${flexlib_include_DIR}/ctp_registry.hpp
 )
+
+# LLVM and Clang are compiled with -fno-rtti by default.  You have three options:
+# - You can re-enable RTTI when you build LLVM and Clang.
+# - If you don't use RTTI in your project, you can just compile with -fno-rtti.
+# - You can compile every file that emits the vtable for this class with -fno-rtti.  The easier way to do this is to anchor the vtable to a particular file and compile that with -fno-rtti.
+set_source_files_properties(
+  ${flexlib_src_DIR}/matchers/annotation_matcher.cc
+  PROPERTIES
+  COMPILE_FLAGS
+  -fno-rtti)
+#
+set_source_files_properties(
+  ${flexlib_src_DIR}/annotation_match_handler.cc
+  PROPERTIES
+  COMPILE_FLAGS
+  -fno-rtti)
+#
+set_source_files_properties(
+  ${flexlib_src_DIR}/annotation_parser.cc
+  PROPERTIES
+  COMPILE_FLAGS
+  -fno-rtti)

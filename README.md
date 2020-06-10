@@ -17,11 +17,48 @@ CONAN_LOGGING_LEVEL=10 \
 GIT_SSL_NO_VERIFY=true \
     cmake -E time \
       conan create . conan/stable \
-      -s build_type=Debug -s cling_conan:build_type=Release \
+      -s build_type=Debug \
+      -s cling_conan:build_type=Release \
+      -s llvm_tools:build_type=Release \
       --profile clang \
           -o flexlib:shared=False \
           -o flexlib:enable_clang_from_conan=False \
           -e flexlib:enable_tests=True
+```
+
+## HOW TO BUILD WITH SANITIZERS ENABLED
+
+Use `enable_asan` or `enable_ubsan`, etc.
+
+```bash
+# NOTE: change `build_type=Debug` to `build_type=Release` in production
+CONAN_REVISIONS_ENABLED=1 \
+    CONAN_VERBOSE_TRACEBACK=1 \
+    CONAN_PRINT_RUN_COMMANDS=1 \
+    CONAN_LOGGING_LEVEL=10 \
+    GIT_SSL_NO_VERIFY=true \
+    conan create . \
+        conan/stable \
+        -s build_type=Debug \
+        -s cling_conan:build_type=Release \
+        -s llvm_tools:build_type=Release \
+        --profile clang \
+        --build missing \
+        -s llvm_tools:build_type=Release \
+        -e chromium_base:enable_tests=True \
+        -o chromium_base:enable_tsan=True \
+        -e chromium_base:enable_llvm_tools=True \
+        -o chromium_base:use_alloc_shim=False \
+        -e basis:enable_tests=True \
+        -o basis:enable_tsan=True \
+        -e basis:enable_llvm_tools=True \
+        -e flexlib:enable_tests=True \
+        -o flexlib:enable_tsan=True \
+        -e flexlib:enable_llvm_tools=True \
+        -o flexlib:enable_clang_from_conan=False \
+        -o flexlib:shared=False \
+        -o chromium_tcmalloc:use_alloc_shim=False \
+        -o openssl:shared=True
 ```
 
 ## For contibutors: conan editable mode
@@ -42,7 +79,9 @@ GIT_SSL_NO_VERIFY=true \
   cmake -E time \
     conan install . \
     --install-folder local_build \
-    -s build_type=Debug -s cling_conan:build_type=Release \
+    -s build_type=Debug \
+    -s cling_conan:build_type=Release \
+    -s llvm_tools:build_type=Release \
     --profile clang \
       -o flexlib:shared=False \
       -o flexlib:enable_clang_from_conan=False \
