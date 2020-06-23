@@ -4,6 +4,7 @@ list(APPEND flexlib_SOURCES
   ${flexlib_src_DIR}/per_plugin_settings.cpp
   ${flexlib_include_DIR}/per_plugin_settings.hpp
   #
+  ${flexlib_src_DIR}/ToolPlugin.cc
   ${flexlib_include_DIR}/ToolPlugin.hpp
   #
   ${flexlib_src_DIR}/CXXCTP_STD/CXXCTP_STD.cpp

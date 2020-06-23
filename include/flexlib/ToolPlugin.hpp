@@ -79,6 +79,8 @@ class ToolPlugin
     DETACH_FROM_SEQUENCE(sequence_checker_);
   }
 
+  virtual ~ToolPlugin();
+
   static std::string pluginInterface() {
     // plugin interface version checks to avoid unexpected behavior
     return "backend.ToolPlugin/1.0";
