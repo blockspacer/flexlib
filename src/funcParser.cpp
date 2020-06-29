@@ -12,6 +12,7 @@ static const char kArgumentAssign = '=';
 
 } // namespace
 
+/// \todo use base::SplitStringIntoKeyValuePairs and base::StringPairs
 functionArgument extract_func_arg(std::string const& inStr) {
   std::string arg_value_ = inStr;
   std::string arg_name_ = "";
@@ -44,6 +45,7 @@ std::vector<flexlib::parsed_func> split_to_funcs(std::string const& inStr) {
   while (ss >> std::ws) {
       if (ss.peek() == '"') { // TODO: inner "
           std::string quoted;
+          /// \todo use base::StringTokenizer
           ss >> std::quoted(quoted);
           //std::cout << "quoted " << quoted << "\n";
           func_with_args_ += '"' + quoted + '"';
