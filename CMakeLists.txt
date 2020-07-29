@@ -31,9 +31,11 @@ if (CONAN_AUTO_INSTALL)
   else()
     set(conan_build_type "Debug")
   endif()
-  # No --build=missing cause llvm requires long build
+  # No --build=missing cause llvm requires long build.
+  # You can use `EXTRA_CONAN_AUTO_INSTALL_OPTIONS` like so:
+  # cmake .. -DCONAN_AUTO_INSTALL=ON -DEXTRA_CONAN_AUTO_INSTALL_OPTIONS="--build missing" -DCMAKE_BUILD_TYPE=Debug
   conan_auto_install(
-    CONAN_OPTIONS "--profile=${CONAN_PROFILE} -s build_type=${conan_build_type} -s cling_conan:build_type=Release -s llvm_tools:build_type=Release -o openssl:shared=True"
+    CONAN_OPTIONS "--profile=${CONAN_PROFILE} -s build_type=${conan_build_type} -s cling_conan:build_type=Release -s llvm_tools:build_type=Release -o openssl:shared=True ${EXTRA_CONAN_AUTO_INSTALL_OPTIONS}"
     #FORCE
   )
 endif()
@@ -75,14 +77,26 @@ if(ENABLE_MSAN OR ENABLE_TSAN OR ENABLE_ASAN OR ENABLE_UBSAN)
   find_package(cmake_sanitizers REQUIRED)
 endif()
 
-#if(ENABLE_ASAN
-#   OR ENABLE_TSAN
-#   OR ENABLE_MSAN
-#   OR ENABLE_UBSAN
-#   #OR ENABLE_VALGRIND # TODO: valgrind support
-#   )
-#  list(APPEND BASIS_PUBLIC_DEFINES MEMORY_TOOL_REPLACES_ALLOCATOR=1)
-#endif()
+if(ENABLE_MSAN)
+  add_msan_flags()
+endif(ENABLE_MSAN)
+
+if(ENABLE_TSAN)
+  add_tsan_flags()
+endif(ENABLE_TSAN)
+
+if(ENABLE_ASAN)
+  add_asan_flags()
+endif(ENABLE_ASAN)
+
+if(ENABLE_UBSAN)
+  add_ubsan_flags()
+endif(ENABLE_UBSAN)
+
+if(COMPILE_WITH_LLVM_TOOLS)
+  # force change CMAKE_*_COMPILER and CMAKE_LINKER to clang from conan
+  compile_with_llvm_tools() # from cmake_helper_utils (conan package)
+endif(COMPILE_WITH_LLVM_TOOLS)
 
 set_project_version(0 0 1) # from Utils.cmake
 
@@ -101,10 +115,9 @@ if(NOT TARGET CONAN_PKG::chromium_base)
   message(FATAL_ERROR "Use chromium_base from conan")
 endif()
 
-if(NOT TARGET CONAN_PKG::clang_folly_conan)
-  message(FATAL_ERROR "Use clang_folly_conan from conan")
-endif()
-
+#if(NOT TARGET CONAN_PKG::clang_folly_conan)
+#  message(FATAL_ERROR "Use clang_folly_conan from conan")
+#endif()
 
 if(NOT TARGET CONAN_PKG::chromium_build_util)
   message(FATAL_ERROR "Use chromium_build_util from conan")
@@ -138,8 +151,8 @@ message(STATUS "X11_LIBRARIES = ${X11_LIBRARIES}")
 find_package( EXPAT REQUIRED )
 message(STATUS "EXPAT_LIBRARIES = ${EXPAT_LIBRARIES}")
 
-find_package( ZLIB REQUIRED )
-message(STATUS "ZLIB_LIBRARIES = ${ZLIB_LIBRARIES}")
+#find_package( ZLIB REQUIRED )
+#message(STATUS "ZLIB_LIBRARIES = ${ZLIB_LIBRARIES}")
 
 #add_library( boost_outcome INTERFACE )
 #target_include_directories( boost_outcome SYSTEM INTERFACE "submodules/boost.outcome/include" )
@@ -204,21 +217,22 @@ list(APPEND USED_3DPARTY_LIBS
   ${basis_LIB}
   #TODO: doctest
   #CONAN_PKG::doctest
-  CONAN_PKG::clang_folly_conan
+  #CONAN_PKG::clang_folly_conan
   CONAN_PKG::boost
-  CONAN_PKG::double-conversion
-  CONAN_PKG::glog
-  CONAN_PKG::lz4
-  CONAN_PKG::lzma
-  CONAN_PKG::zstd
-  CONAN_PKG::snappy
-  CONAN_PKG::libsodium
-  CONAN_PKG::libdwarf
-  CONAN_PKG::bzip2
-  CONAN_PKG::gflags
-  CONAN_PKG::libunwind
-  CONAN_PKG::libelf
-  CONAN_PKG::xz_utils
+  CONAN_PKG::openssl
+  #CONAN_PKG::double-conversion
+  #CONAN_PKG::glog
+  #CONAN_PKG::lz4
+  #CONAN_PKG::lzma
+  #CONAN_PKG::zstd
+  #CONAN_PKG::snappy
+  #CONAN_PKG::libsodium
+  #CONAN_PKG::libdwarf
+  #CONAN_PKG::bzip2
+  #CONAN_PKG::gflags
+  #CONAN_PKG::libunwind
+  #CONAN_PKG::libelf
+  #CONAN_PKG::xz_utils
   CONAN_PKG::corrade
   Corrade::PluginManager
   ${USED_BOOST_LIBS}
@@ -228,17 +242,17 @@ set(USED_SYSTEM_LIBS
     Threads::Threads # pthread, https://cmake.org/cmake/help/v3.13/module/FindThreads.html
     ${X11_LIBRARIES} # https://cmake.org/cmake/help/v3.13/module/FindX11.html
     ${CMAKE_DL_LIBS} # https://cmake.org/cmake/help/v3.13/variable/CMAKE_DL_LIBS.html
-    EXPAT::EXPAT # https://cmake.org/cmake/help/v3.13/module/FindEXPAT.html
-    ZLIB::ZLIB # https://cmake.org/cmake/help/v3.13/module/FindZLIB.html
+    #EXPAT::EXPAT # https://cmake.org/cmake/help/v3.13/module/FindEXPAT.html
+    #ZLIB::ZLIB # https://cmake.org/cmake/help/v3.13/module/FindZLIB.html
                # Custom libs
     stdc++fs # C++17 std::filesystem
     # @note: Order matters https://stackoverflow.com/a/10269201/10904212
-    ${LIBIBERTY_LIBRARY} # used by folly
-    ${DOUBLE_CONVERSION_LIBRARY} # used by folly
-    ${LIBEVENT_LIB} # used by folly
-    ${LZ4_LIBRARY} # used by folly
-    ${LIBUNWIND_LIBRARIES} # used by folly
-    ${LIBLZMA_LIBRARIES} # used by folly
+    #${LIBIBERTY_LIBRARY} # used by folly
+    #${DOUBLE_CONVERSION_LIBRARY} # used by folly
+    #${LIBEVENT_LIB} # used by folly
+    #${LZ4_LIBRARY} # used by folly
+    #${LIBUNWIND_LIBRARIES} # used by folly
+    #${LIBLZMA_LIBRARIES} # used by folly
     CACHE INTERNAL "USED_SYSTEM_LIBS")
 
 target_link_libraries(${LIB_NAME} INTERFACE
@@ -260,17 +274,17 @@ set(USED_SYSTEM_LIBS
     Threads::Threads # pthread, https://cmake.org/cmake/help/v3.13/module/FindThreads.html
     ${X11_LIBRARIES} # https://cmake.org/cmake/help/v3.13/module/FindX11.html
     ${CMAKE_DL_LIBS} # https://cmake.org/cmake/help/v3.13/variable/CMAKE_DL_LIBS.html
-    EXPAT::EXPAT # https://cmake.org/cmake/help/v3.13/module/FindEXPAT.html
-    ZLIB::ZLIB # https://cmake.org/cmake/help/v3.13/module/FindZLIB.html
+    #EXPAT::EXPAT # https://cmake.org/cmake/help/v3.13/module/FindEXPAT.html
+    #ZLIB::ZLIB # https://cmake.org/cmake/help/v3.13/module/FindZLIB.html
                # Custom libs
     stdc++fs # C++17 std::filesystem
     # @note: Order matters https://stackoverflow.com/a/10269201/10904212
-    ${LIBIBERTY_LIBRARY} # used by folly
-    ${DOUBLE_CONVERSION_LIBRARY} # used by folly
-    ${LIBEVENT_LIB} # used by folly
-    ${LZ4_LIBRARY} # used by folly
-    ${LIBUNWIND_LIBRARIES} # used by folly
-    ${LIBLZMA_LIBRARIES} # used by folly
+    #${LIBIBERTY_LIBRARY} # used by folly
+    #${DOUBLE_CONVERSION_LIBRARY} # used by folly
+    #${LIBEVENT_LIB} # used by folly
+    #${LZ4_LIBRARY} # used by folly
+    #${LIBUNWIND_LIBRARIES} # used by folly
+    #${LIBLZMA_LIBRARIES} # used by folly
     CACHE INTERNAL "USED_SYSTEM_LIBS")
 
 target_link_libraries(${LIB_NAME} PUBLIC#PRIVATE

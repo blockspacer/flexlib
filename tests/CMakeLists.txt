@@ -35,7 +35,7 @@ message( "CONAN_PKG::FakeIt=${FakeIt_IMPORTED_LOCATION}" )
 list(APPEND TESTS_3DPARTY_LIBS
     CONAN_PKG::cling_conan
     #FakeIt
-    CONAN_PKG::gtest
+    CONAN_PKG::conan_gtest
     #TODO: doctest
     #CONAN_PKG::doctest
     CONAN_PKG::FakeIt
@@ -99,7 +99,7 @@ macro(set_test_compile_options target)
     CXX_EXTENSIONS OFF
     CMAKE_CXX_STANDARD_REQUIRED ON
     CMAKE_CXX_FLAGS "-frtti /std:c++latest"
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}/tests )
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} )
 endmacro()
 
 macro(tests_add_executable target source_list TEST_ARGS TEST_LIB)
@@ -281,7 +281,8 @@ message(STATUS "flexlib: copying ${CMAKE_CURRENT_SOURCE_DIR}/data")
 # "gmock" is one of test program names
 add_custom_command( TARGET ${ROOT_PROJECT_NAME}-gmock POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy_directory
-                        ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_BINARY_DIR}/bin/$<CONFIG>/tests/data )
+                        ${CMAKE_CURRENT_SOURCE_DIR}/data
+                        ${CMAKE_CURRENT_BINARY_DIR} )
 
 enable_testing()
 
