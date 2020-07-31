@@ -132,9 +132,7 @@ else()
 endif()
 
 find_package(chromium_base REQUIRED)
-if(TARGET chromium_base::chromium_base-static)
-  set(base_LIB chromium_base::chromium_base-static)
-else()
+if(NOT TARGET ${base_LIB})
   message(FATAL_ERROR "not supported: using system provided chromium_base library")
 endif()
 
@@ -359,7 +357,9 @@ target_compile_definitions(${LIB_NAME} PUBLIC
 target_compile_definitions(${LIB_NAME} PRIVATE
   ${flexlib_PRIVATE_DEFINES}
   # https://stackoverflow.com/a/30877725
-  BOOST_SYSTEM_NO_DEPRECATED BOOST_ERROR_CODE_HEADER_ONLY
+  BOOST_SYSTEM_NO_DEPRECATED
+  BOOST_ERROR_CODE_HEADER_ONLY
+  BOOST_ASIO_STANDALONE=1
 )
 
 target_compile_definitions(${LIB_NAME} PUBLIC

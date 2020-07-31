@@ -177,6 +177,7 @@ class flexlib_conan_project(conan_build_helper.CMakePackage):
 
         if self.options.enable_ubsan:
             self.options["basis"].enable_ubsan = True
+            self.options["corrade"].enable_ubsan = True
             self.options["chromium_base"].enable_ubsan = True
             if not self.options.use_system_boost:
               self.options["boost"].enable_ubsan = True
@@ -185,6 +186,7 @@ class flexlib_conan_project(conan_build_helper.CMakePackage):
 
         if self.options.enable_asan:
             self.options["basis"].enable_asan = True
+            self.options["corrade"].enable_asan = True
             self.options["chromium_base"].enable_asan = True
             if not self.options.use_system_boost:
               self.options["boost"].enable_asan = True
@@ -193,6 +195,7 @@ class flexlib_conan_project(conan_build_helper.CMakePackage):
 
         if self.options.enable_msan:
             self.options["basis"].enable_msan = True
+            self.options["corrade"].enable_msan = True
             self.options["chromium_base"].enable_msan = True
             if not self.options.use_system_boost:
               self.options["boost"].enable_msan = True
@@ -201,6 +204,7 @@ class flexlib_conan_project(conan_build_helper.CMakePackage):
 
         if self.options.enable_tsan:
             self.options["basis"].enable_tsan = True
+            self.options["corrade"].enable_tsan = True
             self.options["chromium_base"].enable_tsan = True
             if not self.options.use_system_boost:
               self.options["boost"].enable_tsan = True
@@ -255,7 +259,7 @@ class flexlib_conan_project(conan_build_helper.CMakePackage):
 
       self.requires("basis/master@conan/stable")
 
-      self.requires("corrade/2020.06@magnum/stable")
+      self.requires("corrade/v2020.06@conan/stable")
 
       #self.requires("type_safe/0.2@conan/stable")
 
