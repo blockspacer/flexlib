@@ -1,5 +1,3 @@
-#pragma once
-
 #include "flexlib/ToolPlugin.hpp" // IWYU pragma: associated
 
 namespace plugin {

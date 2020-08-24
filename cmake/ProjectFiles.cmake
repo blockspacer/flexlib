@@ -7,6 +7,9 @@ list(APPEND flexlib_SOURCES
   ${flexlib_src_DIR}/ToolPlugin.cc
   ${flexlib_include_DIR}/ToolPlugin.hpp
   #
+  ${flexlib_src_DIR}/boost_command_line.cpp
+  ${flexlib_include_DIR}/boost_command_line.hpp
+  #
   ${flexlib_src_DIR}/CXXCTP_STD/CXXCTP_STD.cpp
   ${flexlib_include_DIR}/CXXCTP_STD/CXXCTP_STD.hpp
   #
@@ -57,6 +60,15 @@ list(APPEND flexlib_SOURCES
   ${flexlib_src_DIR}/ctp_registry.cpp
   ${flexlib_include_DIR}/ctp_registry.hpp
 )
+
+# without rtti you will get error:
+# ERROR: boost::bad_any_cast: failed conversion using boost::any_cast
+set_source_files_properties(
+  ${flexlib_src_DIR}/boost_command_line.cpp
+  ${flexlib_include_DIR}/boost_command_line.hpp
+  PROPERTIES
+    COMPILE_FLAGS
+      -frtti)
 
 # LLVM and Clang are compiled with -fno-rtti by default.  You have three options:
 # - You can re-enable RTTI when you build LLVM and Clang.

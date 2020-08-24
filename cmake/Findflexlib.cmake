@@ -20,18 +20,20 @@ set(flexlib_LIB CONAN_PKG::flexlib)
 set(flexlib_HEADER_DIR
   ${CONAN_FLEXLIB_ROOT}/include
 )
-if(flexlib_LOCAL_BUILD)
+# used by https://docs.conan.io/en/latest/developing_packages/workspaces.html
+if(TARGET flexlib)
   # name of created target
   set(flexlib_LIB flexlib)
-  # no '/include' dir on local build
   set(flexlib_HEADER_DIR
     ${CONAN_FLEXLIB_ROOT}/include
   )
-else()
+endif()
+
+if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/cmake/flexlib-config.cmake")
   # uses Config.cmake or a -config.cmake file
   # see https://gitlab.kitware.com/cmake/community/wikis/doc/tutorials/How-to-create-a-ProjectConfig.cmake-file
   # BELOW MUST BE EQUAL TO find_package(... CONFIG REQUIRED)
   # NOTE: find_package(CONFIG) not supported with EMSCRIPTEN, so use include()
   include(${CMAKE_CURRENT_LIST_DIR}/cmake/flexlib-config.cmake)
-endif(flexlib_LOCAL_BUILD)
+endif()
 message(STATUS "flexlib_HEADER_DIR=${flexlib_HEADER_DIR}")

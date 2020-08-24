@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "reflect/ReflectAST.hpp"
+#include "flexlib/reflect/ReflectAST.hpp"
 
 #include <clang/AST/Decl.h>
 #include <clang/AST/DeclCXX.h>
@@ -12,6 +12,7 @@
 #include <clang/Rewrite/Core/Rewriter.h>
 #include <clang/Lex/Preprocessor.h>
 
+#include <base/macros.h>
 #include <base/callback.h>
 
 #include <string>

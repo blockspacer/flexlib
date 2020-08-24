@@ -115,10 +115,6 @@ if(NOT TARGET CONAN_PKG::chromium_base)
   message(FATAL_ERROR "Use chromium_base from conan")
 endif()
 
-#if(NOT TARGET CONAN_PKG::clang_folly_conan)
-#  message(FATAL_ERROR "Use clang_folly_conan from conan")
-#endif()
-
 if(NOT TARGET CONAN_PKG::chromium_build_util)
   message(FATAL_ERROR "Use chromium_build_util from conan")
 endif()
@@ -133,7 +129,7 @@ endif()
 
 find_package(chromium_base REQUIRED)
 if(NOT TARGET ${base_LIB})
-  message(FATAL_ERROR "not supported: using system provided chromium_base library")
+  message(FATAL_ERROR "not supported ${base_LIB}: using system provided chromium_base library")
 endif()
 
 # see https://doc.magnum.graphics/corrade/corrade-cmake.html#corrade-cmake-subproject
@@ -213,24 +209,8 @@ message(STATUS "basis_LIB=${basis_LIB}")
 
 list(APPEND USED_3DPARTY_LIBS
   ${basis_LIB}
-  #TODO: doctest
-  #CONAN_PKG::doctest
-  #CONAN_PKG::clang_folly_conan
   CONAN_PKG::boost
   CONAN_PKG::openssl
-  #CONAN_PKG::double-conversion
-  #CONAN_PKG::glog
-  #CONAN_PKG::lz4
-  #CONAN_PKG::lzma
-  #CONAN_PKG::zstd
-  #CONAN_PKG::snappy
-  #CONAN_PKG::libsodium
-  #CONAN_PKG::libdwarf
-  #CONAN_PKG::bzip2
-  #CONAN_PKG::gflags
-  #CONAN_PKG::libunwind
-  #CONAN_PKG::libelf
-  #CONAN_PKG::xz_utils
   CONAN_PKG::corrade
   Corrade::PluginManager
   ${USED_BOOST_LIBS}
@@ -240,17 +220,7 @@ set(USED_SYSTEM_LIBS
     Threads::Threads # pthread, https://cmake.org/cmake/help/v3.13/module/FindThreads.html
     ${X11_LIBRARIES} # https://cmake.org/cmake/help/v3.13/module/FindX11.html
     ${CMAKE_DL_LIBS} # https://cmake.org/cmake/help/v3.13/variable/CMAKE_DL_LIBS.html
-    #EXPAT::EXPAT # https://cmake.org/cmake/help/v3.13/module/FindEXPAT.html
-    #ZLIB::ZLIB # https://cmake.org/cmake/help/v3.13/module/FindZLIB.html
-               # Custom libs
     stdc++fs # C++17 std::filesystem
-    # @note: Order matters https://stackoverflow.com/a/10269201/10904212
-    #${LIBIBERTY_LIBRARY} # used by folly
-    #${DOUBLE_CONVERSION_LIBRARY} # used by folly
-    #${LIBEVENT_LIB} # used by folly
-    #${LZ4_LIBRARY} # used by folly
-    #${LIBUNWIND_LIBRARIES} # used by folly
-    #${LIBLZMA_LIBRARIES} # used by folly
     CACHE INTERNAL "USED_SYSTEM_LIBS")
 
 target_link_libraries(${LIB_NAME} INTERFACE
