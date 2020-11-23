@@ -44,7 +44,7 @@
 
 namespace po = boost::program_options;
 
-namespace {
+namespace std {
 
 /// \todo code repeat
 template<class T>
@@ -57,7 +57,7 @@ std::ostream& operator<<(
     stream;
 }
 
-} // namespace
+} // namespace std
 
 namespace cmd {
 
