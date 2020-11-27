@@ -182,7 +182,7 @@ int main(int argc, char* argv[]) {
 #if defined(USE_DOCTEST_TEST)
   {
     doctest::Context ctx
-      = doctest_util::initDoctest(argc, argv);
+      = basis::initDoctest(argc, argv);
 
     LOG(INFO) << "created doctest context...";
 
