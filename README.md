@@ -24,6 +24,9 @@ GIT_SSL_NO_VERIFY=true \
           -o flexlib:shared=False \
           -o flexlib:enable_clang_from_conan=False \
           -e flexlib:enable_tests=True
+
+# clean build cache
+conan remove "*" --build --force
 ```
 
 ## HOW TO BUILD WITH SANITIZERS ENABLED
