@@ -134,3 +134,13 @@ In order to revert the editable mode just remove the link using:
 conan editable remove \
   flexlib/master@conan/stable
 ```
+
+## Disclaimer
+
+That open source project based on the Google Chromium project.
+
+This is not official Google product.
+
+Portions Copyright (c) Google Inc.
+
+See LICENSE files.
