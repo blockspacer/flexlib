@@ -1,5 +1,7 @@
 ﻿#include "flexlib/ClingInterpreterModule.hpp" // IWYU pragma: associated
 
+#include <base/check.h>
+
 #if defined(CLING_IS_ON)
 
 #include "flexlib/options/ctp/options.hpp"

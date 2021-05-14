@@ -1,6 +1,7 @@
 ﻿#include "flexlib/per_plugin_settings.hpp" // IWYU pragma: associated
 
 #include "base/logging.h"
+#include "base/check.h"
 
 namespace flexlib {
 

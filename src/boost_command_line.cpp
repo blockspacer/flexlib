@@ -6,6 +6,7 @@
 #include <base/feature_list.h>
 #include <base/strings/string_piece.h>
 #include <base/files/file_util.h>
+#include <base/check.h>
 
 #include <boost/none.hpp>
 #include <boost/optional/optional.hpp>

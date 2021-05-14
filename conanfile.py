@@ -42,6 +42,7 @@ class flexlib_conan_project(conan_build_helper.CMakePackage):
         "shared": [True, False],
         "use_system_boost": [True, False],
         "enable_clang_from_conan": [True, False],
+        "enable_cling": [True, False],
         "enable_ubsan": [True, False],
         "enable_asan": [True, False],
         "enable_msan": [True, False],
@@ -53,6 +54,7 @@ class flexlib_conan_project(conan_build_helper.CMakePackage):
         #"*:shared=False",
         "shared=False",
         "enable_clang_from_conan=False",
+        "enable_cling=True",
         "use_system_boost=False",
         "enable_ubsan=False",
         "enable_asan=False",
@@ -131,14 +133,8 @@ class flexlib_conan_project(conan_build_helper.CMakePackage):
         "llvm_x86_codegen:shared=False",
         "clang_analysis:shared=False",
         "clang_ast:shared=False",
-        # FakeIt
-        "FakeIt:integration=catch",
         # openssl
         "openssl:shared=True",
-        # chromium_base
-        "chromium_base:use_alloc_shim=True",
-        # chromium_tcmalloc
-        "chromium_tcmalloc:use_alloc_shim=True",
     )
 
     # Custom attributes for Bincrafters recipe conventions
@@ -183,6 +179,14 @@ class flexlib_conan_project(conan_build_helper.CMakePackage):
         if self.options.enable_valgrind:
             self.options["basis"].enable_valgrind = True
             self.options["chromium_base"].enable_valgrind = True
+
+        if not self.options.enable_clang_from_conan \
+           and not self.options.enable_cling:
+           raise ConanInvalidConfiguration("Unable to find clang headers. Choose clang or cling in conan options.")
+
+        if self.options.enable_clang_from_conan \
+           and self.options.enable_cling:
+           raise ConanInvalidConfiguration("Unable to use both clang and cling headers at same time. Choose clang or cling in conan options.")
 
         if self.options.enable_ubsan \
            or self.options.enable_asan \
@@ -255,12 +259,7 @@ class flexlib_conan_project(conan_build_helper.CMakePackage):
     def requirements(self):
 
       if self._is_tests_enabled():
-          self.requires("catch2/[>=2.1.0]@bincrafters/stable")
           self.requires("conan_gtest/stable@conan/stable")
-          self.requires("FakeIt/[>=2.0.4]@gasuketsu/stable")
-
-      # TODO: support doctest
-      #self.requires("doctest/[>=2.3.8]")
 
       if not self.options.use_system_boost:
           self.requires("boost/1.71.0@dev/stable")
@@ -275,8 +274,8 @@ class flexlib_conan_project(conan_build_helper.CMakePackage):
         self.requires("clang_analysis/6.0.1@Manu343726/testing")
         self.requires("clang_ast/6.0.1@Manu343726/testing")
         self.requires("llvm/6.0.1@Manu343726/testing")
-      else:
-        self.requires("cling_conan/master@conan/stable")
+      elif self.options.enable_cling:
+        self.requires("cling_conan/v0.9@conan/stable")
 
       self.requires("chromium_base/master@conan/stable")
 
@@ -335,21 +334,13 @@ class flexlib_conan_project(conan_build_helper.CMakePackage):
         if not self.options.enable_valgrind:
             cmake.definitions["ENABLE_VALGRIND"] = 'OFF'
 
-        cmake.definitions["ENABLE_UBSAN"] = 'ON'
-        if not self.options.enable_ubsan:
-            cmake.definitions["ENABLE_UBSAN"] = 'OFF'
+        cmake.definitions["ENABLE_UBSAN"] = "ON" if self.options.enable_ubsan else "OFF"
 
-        cmake.definitions["ENABLE_ASAN"] = 'ON'
-        if not self.options.enable_asan:
-            cmake.definitions["ENABLE_ASAN"] = 'OFF'
+        cmake.definitions["ENABLE_ASAN"] = "ON" if self.options.enable_asan else "OFF"
 
-        cmake.definitions["ENABLE_MSAN"] = 'ON'
-        if not self.options.enable_msan:
-            cmake.definitions["ENABLE_MSAN"] = 'OFF'
+        cmake.definitions["ENABLE_MSAN"] = "ON" if self.options.enable_msan else "OFF"
 
-        cmake.definitions["ENABLE_TSAN"] = 'ON'
-        if not self.options.enable_tsan:
-            cmake.definitions["ENABLE_TSAN"] = 'OFF'
+        cmake.definitions["ENABLE_TSAN"] = "ON" if self.options.enable_tsan else "OFF"
 
         no_doctest = (str(self.settings.build_type).lower() != "debug"
           and str(self.settings.build_type).lower() != "relwithdebinfo")
@@ -372,8 +363,10 @@ class flexlib_conan_project(conan_build_helper.CMakePackage):
             cmake.definitions["CMAKE_CXX_COMPILER"] = "g++-{}".format(
                 self.settings.compiler.version)
 
-        if not self.options.enable_clang_from_conan:
+        if self.options.enable_cling:
           cmake.definitions["ENABLE_CLING"] = 'ON'
+        else:
+          cmake.definitions["ENABLE_CLING"] = 'OFF'
 
         cmake.definitions["CMAKE_TOOLCHAIN_FILE"] = 'conan_paths.cmake'
 
@@ -383,10 +376,13 @@ class flexlib_conan_project(conan_build_helper.CMakePackage):
         self.copy(pattern="LICENSE", dst="licenses", src=self._source_subfolder)
         cmake = self._configure_cmake()
         cmake.install()
-        # Local build
-        # see https://docs.conan.io/en/latest/developing_packages/editable_packages.html
-        if not self.in_local_cache:
-            self.copy("conanfile.py", dst=".", keep_path=False)
+
+        self.copy_conanfile_for_editable_package(".")
+
+        self.rmdir_if_packaged('.git')
+        self.rmdir_if_packaged('tests')
+        self.rmdir_if_packaged('lib/tests')
+        self.rmdir_if_packaged('lib/pkgconfig')
 
     def build(self):
         cmake = self._configure_cmake()
@@ -409,9 +405,7 @@ class flexlib_conan_project(conan_build_helper.CMakePackage):
 
         if self._is_tests_enabled():
           self.output.info('Running tests')
-          cmake.build(args=["--target", "flexlib_run_all_tests", "--", "-j%s" % cpu_count])
-          #self.run('ctest --parallel %s' % (cpu_count))
-          # TODO: use cmake.test()
+          cmake.test(target="flexlib_run_unittests", output_on_failure=True)
 
     # Importing files copies files from the local store to your project.
     def imports(self):

@@ -80,6 +80,7 @@
 #include <llvm/Support/FileSystem.h>
 
 #include <base/logging.h>
+#include <base/check.h>
 
 #if __has_include(<filesystem>)
 namespace fs = std::filesystem;
@@ -211,7 +212,7 @@ AnnotationMatchAction::AnnotationMatchAction(
 AnnotationMatchAction::ASTConsumerPointer
   AnnotationMatchAction::CreateASTConsumer(
     clang::CompilerInstance& compilerInstance
-    , StringRef filename)
+    , llvm::StringRef filename)
 {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
 

@@ -2,6 +2,8 @@
 
 #include "flexlib/parser_constants.hpp"
 
+#include <base/check.h>
+
 namespace flexlib {
 
 AnnotationParser::AnnotationParser(

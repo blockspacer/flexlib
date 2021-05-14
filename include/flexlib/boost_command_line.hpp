@@ -2,6 +2,7 @@
 
 #include <base/logging.h>
 #include <base/macros.h>
+#include <base/check.h>
 #include <base/sequence_checker.h>
 #include <base/files/file_path.h>
 #include <base/strings/string_piece.h>

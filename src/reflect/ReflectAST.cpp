@@ -13,6 +13,7 @@
 #include <boost/algorithm/string/replace.hpp>
 
 #include <base/logging.h>
+#include <base/check.h>
 
 namespace reflection
 {
@@ -201,7 +202,7 @@ ClassInfoPtr AstReflector::ReflectClass(
     DCHECK(llvm::dyn_cast_or_null<clang::RecordDecl>(decl));
 
     FullSourceLoc fullLocation
-      = m_astContext->getFullLoc(decl->getLocStart());
+      = m_astContext->getFullLoc(decl->getBeginLoc());
     DCHECK(fullLocation.isValid());
 
     /// Get or compute information about the layout
@@ -541,8 +542,8 @@ MethodInfoPtr AstReflector::ReflectMethod(
   if (body != nullptr)
   {
     auto& srcMgr = m_astContext->getSourceManager();
-    auto locStart = body->getLocStart();
-    auto locEnd = body->getLocEnd();
+    clang::SourceLocation locStart = body->getBeginLoc();
+    clang::SourceLocation locEnd = body->getEndLoc();
     auto len
       = srcMgr.getFileOffset(locEnd)
           - srcMgr.getFileOffset(locStart);

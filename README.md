@@ -1,6 +1,36 @@
 # About
 
-C++ lib
+C++ lib used by https://github.com/blockspacer/flextool
+
+## Before installation: Add conan remotes
+
+To be able to add the list of dependency remotes please type the following command:
+
+```bash
+cmake -E time conan config install conan/remotes/
+# OR:
+# cmake -E time conan config install conan/remotes_disabled_ssl/
+```
+
+## Before build (dependencies)
+
+Create clang conan profile https://docs.conan.io/en/1.34/reference/profiles.html#examples
+
+Re-build dependencies:
+
+```bash
+git clone https://github.com/blockspacer/conan_github_downloader.git ~/conan_github_downloader
+
+cmake \
+  -DSCRIPT_PATH="$PWD/get_conan_dependencies.cmake"\
+  -DEXTRA_CONAN_OPTS="--profile;clang\
+;-s;build_type=Debug\
+;-s;cling_conan:build_type=Release\
+;-s;llvm_tools:build_type=Release\
+;-D;ENABLE_CLING=TRUE\
+;--build;missing" \
+  -P ~/conan_github_downloader/conan_github_downloader.cmake
+```
 
 ## Installation
 
@@ -27,6 +57,60 @@ GIT_SSL_NO_VERIFY=true \
 
 # clean build cache
 conan remove "*" --build --force
+```
+
+## Dev-only build (local conan flow)
+
+```bash
+find . -type f -name "*_buildflags.h" -exec rm {} \;
+find . -type f -name "*_buildflags.tmp" -exec rm {} \;
+
+(rm -rf local_build || true)
+
+mkdir local_build
+
+cd local_build
+
+export CONAN_REVISIONS_ENABLED=1
+export CONAN_VERBOSE_TRACEBACK=1
+export CONAN_PRINT_RUN_COMMANDS=1
+export CONAN_LOGGING_LEVEL=10
+export GIT_SSL_NO_VERIFY=true
+
+# NOTE: use --build=missing if you got error `ERROR: Missing prebuilt package`
+cmake -E time \
+  conan install .. \
+  --install-folder . \
+  -s build_type=Debug \
+  -s cling_conan:build_type=Release \
+  -s llvm_tools:build_type=Release \
+  --profile clang \
+  -e flexlib:enable_tests=True \
+  -o flexlib:shared=False \
+  -o perfetto:is_hermetic_clang=False
+
+(rm CMakeCache.txt || true)
+
+# You can use `cmake --build . -- -j14` on second run.
+cmake -E time \
+  conan build .. --build-folder=.
+
+cmake -E time \
+  conan package --build-folder=. ..
+
+cmake -E time \
+  conan export-pkg .. conan/stable \
+  -s build_type=Debug \
+  -s cling_conan:build_type=Release \
+  -s llvm_tools:build_type=Release \
+   --force --profile clang
+
+cmake -E time \
+  conan test ../test_package flexlib/master@conan/stable \
+  -s build_type=Debug \
+  -s cling_conan:build_type=Release \
+  -s llvm_tools:build_type=Release \
+  --profile clang
 ```
 
 ## HOW TO BUILD WITH SANITIZERS ENABLED
@@ -96,14 +180,18 @@ CONAN_PRINT_RUN_COMMANDS=1 \
 CONAN_LOGGING_LEVEL=10 \
 GIT_SSL_NO_VERIFY=true \
   cmake -E time \
-    conan source . --source-folder local_build
+    conan source . \
+    --source-folder local_build \
+    --install-folder local_build
 
 conan build . \
   --build-folder local_build
 
 conan package . \
   --build-folder local_build \
-  --package-folder local_build/package_dir
+  --package-folder local_build/package_dir \
+  --source-folder local_build \
+  --install-folder local_build
 ```
 
 Set package to editable mode:
@@ -123,7 +211,9 @@ conan build . \
 
 conan package . \
   --build-folder local_build \
-  --package-folder local_build/package_dir
+  --package-folder local_build/package_dir \
+  --source-folder local_build \
+  --install-folder local_build
 ```
 
 Build your test project

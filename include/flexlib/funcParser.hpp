@@ -4,7 +4,7 @@
 #include <vector>
 #include <map>
 
-#include <basis/doctest_util.hpp>
+#include <basis/doctest_util.h>
 
 namespace flexlib {
 
@@ -44,8 +44,6 @@ std::vector<parsed_func> split_to_funcs(std::string const& inStr);
 
 // DISABLE_DOCTEST: custom macro
 #if !defined(DISABLE_DOCTEST)
-
-#error "TODO: DOCTEST NOT SUPPORTED"
 
 DOCTEST_TEST_SUITE("extract_func_arg") {
   using namespace flexlib;

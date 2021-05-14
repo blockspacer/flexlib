@@ -10,6 +10,7 @@
 #include <boost/algorithm/string/find.hpp>
 
 #include <base/logging.h>
+#include <base/check.h>
 
 #include <iostream>
 #include <sstream>
@@ -362,8 +363,10 @@ public:
           llvm::APSInt value;
           DCHECK(tplArg.getAsExpr());
           DCHECK(m_astContext);
+          Expr::EvalResult EVResult;
           if (tplArg.getAsExpr()
-                ->EvaluateAsInt(value, *m_astContext)) {
+                ->EvaluateAsInt(EVResult, *m_astContext)) {
+            value = EVResult.Val.getInt();
             argInfo
               = ConvertAPSInt(value).AsSigned();
           } else {

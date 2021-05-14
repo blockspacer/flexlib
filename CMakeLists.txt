@@ -7,7 +7,7 @@ project(${PROJECT_NAME}
   VERSION ${PROJECT_VERSION}
   LANGUAGES CXX C)
 
-set(LIB_NAME ${PROJECT_NAME})
+set(FLEXLIB_LIB_NAME ${PROJECT_NAME})
 
 # ------------------------------- Options --------------------------------------
 
@@ -171,7 +171,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CommonOptions.cmake)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/ProjectFiles.cmake)
 
-add_library(${LIB_NAME}-test-includes INTERFACE)
+add_library(${FLEXLIB_LIB_NAME}-test-includes INTERFACE)
 
 # $<INSTALL_INTERFACE:...> is exported using install(EXPORT)
 # $<BUILD_INTERFACE:...> is exported using export(), or when the target is used by another target in the same buildsystem
@@ -180,7 +180,7 @@ macro(add_relative_include_dir TARGET VISIBILITY_BUILD VISIBILITY_INSTALL NEW_EL
     ${VISIBILITY_BUILD} "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${NEW_ELEM}>"
     ${VISIBILITY_INSTALL} "$<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDEDIR}/${NEW_ELEM}>"
   )
-  target_include_directories( ${LIB_NAME}-test-includes SYSTEM INTERFACE
+  target_include_directories( ${FLEXLIB_LIB_NAME}-test-includes SYSTEM INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/${NEW_ELEM} )
 endmacro(add_relative_include_dir)
 
@@ -188,13 +188,13 @@ message(STATUS "flexlib_SOURCES=${flexlib_SOURCES}")
 # NOTE: cling does not support static libs, so we use SHARED
 # https://github.com/root-project/cling/issues/280
 # https://gitlab.kitware.com/cmake/cmake/issues/16473
-add_library(${LIB_NAME} ${CORE_LIB_TYPE}
+add_library(${FLEXLIB_LIB_NAME} ${CORE_LIB_TYPE}
   ${flexlib_SOURCES}
 )
 
-#add_relative_include_dir(${LIB_NAME} PRIVATE PRIVATE "include/flexlib")
+#add_relative_include_dir(${FLEXLIB_LIB_NAME} PRIVATE PRIVATE "include/flexlib")
 
-add_relative_include_dir(${LIB_NAME} PUBLIC PUBLIC "include")
+add_relative_include_dir(${FLEXLIB_LIB_NAME} PUBLIC PUBLIC "include")
 
 list(APPEND USED_3DPARTY_LIBS
   ${base_LIB}
@@ -223,17 +223,17 @@ set(USED_SYSTEM_LIBS
     stdc++fs # C++17 std::filesystem
     CACHE INTERNAL "USED_SYSTEM_LIBS")
 
-target_link_libraries(${LIB_NAME} INTERFACE
+target_link_libraries(${FLEXLIB_LIB_NAME} INTERFACE
   ${USED_3DPARTY_LIBS}
   ${USED_SYSTEM_LIBS}
 )
 
-set_property(TARGET ${LIB_NAME} PROPERTY CXX_STANDARD 17)
+set_property(TARGET ${FLEXLIB_LIB_NAME} PROPERTY CXX_STANDARD 17)
 
 if(TARGET_EMSCRIPTEN)
   # use PROPERTY CXX_STANDARD 17
 else()
-  target_compile_features(${LIB_NAME}
+  target_compile_features(${FLEXLIB_LIB_NAME}
     PUBLIC cxx_auto_type
     PRIVATE cxx_variadic_templates)
 endif()
@@ -255,18 +255,18 @@ set(USED_SYSTEM_LIBS
     #${LIBLZMA_LIBRARIES} # used by folly
     CACHE INTERNAL "USED_SYSTEM_LIBS")
 
-target_link_libraries(${LIB_NAME} PUBLIC#PRIVATE
+target_link_libraries(${FLEXLIB_LIB_NAME} PUBLIC#PRIVATE
   ${USED_3DPARTY_LIBS}
   ${USED_SYSTEM_LIBS}
 )
 
 set(DEBUG_LIBRARY_SUFFIX "-d")
-set_target_properties(${LIB_NAME}
+set_target_properties(${FLEXLIB_LIB_NAME}
   PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}" # TODO: /lib
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}" # TODO: /lib
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}" # TODO: /bin
-    OUTPUT_NAME "${LIB_NAME}$<$<CONFIG:Debug>:${DEBUG_LIBRARY_SUFFIX}>"
+    OUTPUT_NAME "${FLEXLIB_LIB_NAME}$<$<CONFIG:Debug>:${DEBUG_LIBRARY_SUFFIX}>"
     ENABLE_EXPORTS 1
     CXX_STANDARD 17
     CXX_EXTENSIONS OFF
@@ -274,25 +274,25 @@ set_target_properties(${LIB_NAME}
 )
 
 # POSITION_INDEPENDENT_CODE for -fPIC
-set_property(TARGET ${LIB_NAME}
+set_property(TARGET ${FLEXLIB_LIB_NAME}
   PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 if(ENABLE_CLING)
   find_package(Cling REQUIRED)
 
   list(APPEND CLING_DEFINITIONS CLING_IS_ON=1)
-  target_link_libraries(${LIB_NAME} PUBLIC#PRIVATE
+  target_link_libraries(${FLEXLIB_LIB_NAME} PUBLIC#PRIVATE
     CONAN_PKG::cling_conan
   )
 
   get_target_property (cling_conan_IMPORTED_LOCATION CONAN_PKG::cling_conan INTERFACE_INCLUDE_DIRECTORIES)
   message( STATUS "cling_conan=${cling_conan_IMPORTED_LOCATION}" )
-  target_include_directories( ${LIB_NAME} PUBLIC ${cling_conan_IMPORTED_LOCATION} )
+  target_include_directories( ${FLEXLIB_LIB_NAME} PUBLIC ${cling_conan_IMPORTED_LOCATION} )
 
   if(MSVC)
-    set_target_properties(${LIB_NAME} PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS 1)
+    set_target_properties(${FLEXLIB_LIB_NAME} PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS 1)
     set_property(
-      TARGET ${LIB_NAME}
+      TARGET ${FLEXLIB_LIB_NAME}
       APPEND_STRING
       PROPERTY LINK_FLAGS
                "/EXPORT:?setValueNoAlloc@internal@runtime@cling@@YAXPEAX00D_K@Z
@@ -300,11 +300,11 @@ if(ENABLE_CLING)
                 /EXPORT:cling_runtime_internal_throwIfInvalidPointer")
   endif()
 
-  target_compile_definitions(${LIB_NAME} PUBLIC CLING_IS_ON=1)
+  target_compile_definitions(${FLEXLIB_LIB_NAME} PUBLIC CLING_IS_ON=1)
 endif(ENABLE_CLING)
 
 if(ENABLE_CLANG_FROM_CONAN)
-  target_link_libraries( ${LIB_NAME} PUBLIC#PRIVATE
+  target_link_libraries( ${FLEXLIB_LIB_NAME} PUBLIC#PRIVATE
     CONAN_PKG::libclang
     CONAN_PKG::clang_tooling
     CONAN_PKG::clang_tooling_core
@@ -312,19 +312,19 @@ if(ENABLE_CLANG_FROM_CONAN)
   )
 endif(ENABLE_CLANG_FROM_CONAN)
 
-target_compile_options(${LIB_NAME} PRIVATE
+target_compile_options(${FLEXLIB_LIB_NAME} PRIVATE
   $<$<CXX_COMPILER_ID:GNU>:-Wall>)
 
 # FIX for undefined reference to `typeinfo for clang::Decl'
-target_compile_options(${LIB_NAME} PRIVATE
+target_compile_options(${FLEXLIB_LIB_NAME} PRIVATE
   -fno-rtti)
 
 # TODO: DISABLE_DOCTEST
-target_compile_definitions(${LIB_NAME} PUBLIC
+target_compile_definitions(${FLEXLIB_LIB_NAME} PUBLIC
   DISABLE_DOCTEST=1
 )
 
-target_compile_definitions(${LIB_NAME} PRIVATE
+target_compile_definitions(${FLEXLIB_LIB_NAME} PRIVATE
   ${flexlib_PRIVATE_DEFINES}
   # https://stackoverflow.com/a/30877725
   BOOST_SYSTEM_NO_DEPRECATED
@@ -332,7 +332,7 @@ target_compile_definitions(${LIB_NAME} PRIVATE
   BOOST_ASIO_STANDALONE=1
 )
 
-target_compile_definitions(${LIB_NAME} PUBLIC
+target_compile_definitions(${FLEXLIB_LIB_NAME} PUBLIC
   ${flexlib_PUBLIC_DEFINES}
   ${CLING_DEFINITIONS}
 )
@@ -351,5 +351,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/setup_sanitizers.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Exports.cmake)
 
 if(ENABLE_TESTS)
+  enable_testing()
+  message( "${PROJECT_NAME} testing enabled" )
   add_subdirectory( ${CMAKE_CURRENT_SOURCE_DIR}/tests )
 endif()

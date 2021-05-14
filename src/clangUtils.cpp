@@ -6,6 +6,7 @@
 #include <base/strings/string_util.h>
 #include <base/strings/string16.h>
 #include <base/callback.h>
+#include <base/check.h>
 
 namespace clang_utils {
 
@@ -307,11 +308,15 @@ void expandLocations(clang::SourceLocation& startLoc,
       }
     }
 
+    const clang::CharSourceRange immediateExpansionRange = sm.getImmediateExpansionRange( startLoc );
+
+    const clang::SourceLocation immediateSpellingLoc = sm.getImmediateSpellingLoc(startLoc);
+
     startLoc =
       sm.isMacroArgExpansion(startLoc)
       // We're just interested in the start location
-      ? sm.getImmediateSpellingLoc(startLoc)
-      : sm.getImmediateExpansionRange( startLoc ).first;
+      ? immediateSpellingLoc
+      : immediateExpansionRange.getBegin();
   }
 }
 
@@ -697,13 +702,13 @@ void replaceWith(
     = rewriter.getLangOpts();
 
   clang::SourceLocation startLoc
-    = decl->getLocStart();
-  // Note Stmt::getLocEnd() returns the source location prior to the
+    = decl->getBeginLoc();
+  // Note Stmt::getEnd() returns the source location prior to the
   // token at the end of the line.  For instance, for:
   // var = 123;
-  //      ^---- getLocEnd() points here.
+  //      ^---- getEnd() points here.
   clang::SourceLocation endLoc
-    = decl->getLocEnd();
+    = decl->getEndLoc();
 
   // When there is a #include <vector> in the source file,
   // our find-decl will print out all the declarations

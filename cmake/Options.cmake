@@ -1,5 +1,7 @@
 include_guard( DIRECTORY )
 
+set(FLEXLIB_SOURCES_PATH ${CMAKE_CURRENT_SOURCE_DIR}/flexlib/)
+
 # used by https://docs.conan.io/en/latest/developing_packages/workspaces.html
 get_filename_component(LOCAL_BUILD_ABSOLUTE_ROOT_PATH
   "${PACKAGE_flexlib_SRC}"

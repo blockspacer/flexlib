@@ -1,5 +1,7 @@
 ﻿#include "flexlib/annotation_match_handler.hpp" // IWYU pragma: associated
 
+#include <base/check.h>
+
 namespace flexlib {
 
 AnnotationMatchHandler::AnnotationMatchHandler(

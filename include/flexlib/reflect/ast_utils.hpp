@@ -12,6 +12,7 @@
 #include <type_traits>
 
 #include <base/logging.h>
+#include <base/check.h>
 
 /// \todo improve based on p1240r1
 /// http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2019/p1240r1.pdf
