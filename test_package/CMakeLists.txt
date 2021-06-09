@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.1.0)
 project(flexlib_test_package CXX)
 
-option(COMPILE_WITH_LLVM_TOOLS
-  "Enable clang from llvm_tools (conan package)" OFF)
-
 # see https://github.com/Ericsson/codechecker/blob/master/tools/report-converter/README.md#undefined-behaviour-sanitizer
 # NOTE: Compile with -g and -fno-omit-frame-pointer
 # to get proper debug information in your binary.
@@ -39,17 +36,6 @@ option(ENABLE_TSAN
 
 # uncomment to debug CMake
 # set(CMAKE_VERBOSE_MAKEFILE TRUE)
-
-if(COMPILE_WITH_LLVM_TOOLS)
-  message(STATUS
-    "Using COMPILE_WITH_LLVM_TOOLS")
-  # do not check compile in conanbuildinfo
-  # cause we will switch to other compiler after conan install
-  set(CONAN_DISABLE_CHECK_COMPILER ON)
-else(COMPILE_WITH_LLVM_TOOLS)
-  message(STATUS
-    "Disabled COMPILE_WITH_LLVM_TOOLS")
-endif(COMPILE_WITH_LLVM_TOOLS)
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup(

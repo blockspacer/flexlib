@@ -12,9 +12,35 @@ cmake -E time conan config install conan/remotes/
 # cmake -E time conan config install conan/remotes_disabled_ssl/
 ```
 
+## Conan profile
+
+Create clang9 profile:
+
+```bash
+[settings]
+# We are building in Ubuntu Linux
+
+os_build=Linux
+os=Linux
+arch_build=x86_64
+arch=x86_64
+
+compiler=clang
+compiler.version=9
+compiler.libcxx=libc++
+
+llvm_9:build_type=Release
+
+[options]
+llvm_9_installer:compile_with_clang=True
+
+[build_requires]
+cmake_installer/3.15.5@conan/stable
+```
+
 ## Before build (dependencies)
 
-Create clang conan profile https://docs.conan.io/en/1.34/reference/profiles.html#examples
+Create profile https://docs.conan.io/en/1.34/reference/profiles.html#examples
 
 Re-build dependencies:
 
@@ -23,43 +49,37 @@ git clone https://github.com/blockspacer/conan_github_downloader.git ~/conan_git
 
 cmake \
   -DSCRIPT_PATH="$PWD/get_conan_dependencies.cmake"\
-  -DEXTRA_CONAN_OPTS="--profile;clang\
+  -DENABLE_CLING=FALSE\
+  -DENABLE_LLVM_9=FALSE\
+  -DEXTRA_CONAN_OPTS="--profile;clang9\
 ;-s;build_type=Debug\
 ;-s;cling_conan:build_type=Release\
-;-s;llvm_tools:build_type=Release\
-;-D;ENABLE_CLING=TRUE\
+;-s;llvm_9:build_type=Release\
 ;--build;missing" \
   -P ~/conan_github_downloader/conan_github_downloader.cmake
 ```
 
 ## Installation
 
+Create clang_9_cxx11abi_llvm_libs profile:
+
 ```bash
-export CXX=clang++-10
-export CC=clang-10
+[settings]
+os=Linux
+os_build=Linux
+arch=x86_64
+arch_build=x86_64
+compiler=clang
+compiler.version=9
+compiler.libcxx=libstdc++11
+build_type=Release
 
-# NOTE: change `build_type=Debug` to `build_type=Release` in production
-# NOTE: use --build=missing if you got error `ERROR: Missing prebuilt package`
-CONAN_REVISIONS_ENABLED=1 \
-CONAN_VERBOSE_TRACEBACK=1 \
-CONAN_PRINT_RUN_COMMANDS=1 \
-CONAN_LOGGING_LEVEL=10 \
-GIT_SSL_NO_VERIFY=true \
-    cmake -E time \
-      conan create . conan/stable \
-      -s build_type=Debug \
-      -s cling_conan:build_type=Release \
-      -s llvm_tools:build_type=Release \
-      --profile clang \
-          -o flexlib:shared=False \
-          -o flexlib:enable_clang_from_conan=False \
-          -e flexlib:enable_tests=True
-
-# clean build cache
-conan remove "*" --build --force
+[options]
+llvm_9_installer:compile_with_clang=True
+llvm_9_installer:link_libcxx=False
+llvm_9_installer:link_with_llvm_libs=True
+llvm_9_installer:include_what_you_use=False
 ```
-
-## Dev-only build (local conan flow)
 
 ```bash
 find . -type f -name "*_buildflags.h" -exec rm {} \;
@@ -83,8 +103,11 @@ cmake -E time \
   --install-folder . \
   -s build_type=Debug \
   -s cling_conan:build_type=Release \
-  -s llvm_tools:build_type=Release \
-  --profile clang \
+  -s llvm_9:build_type=Release \
+  -o llvm_9_installer:compile_with_clang=True \
+  -o llvm_9_installer:link_libcxx=False \
+  -o llvm_9_installer:link_with_llvm_libs=True \
+  --profile clang_9_cxx11abi_llvm_libs \
   -e flexlib:enable_tests=True \
   -o flexlib:shared=False \
   -o perfetto:is_hermetic_clang=False
@@ -102,128 +125,26 @@ cmake -E time \
   conan export-pkg .. conan/stable \
   -s build_type=Debug \
   -s cling_conan:build_type=Release \
-  -s llvm_tools:build_type=Release \
-   --force --profile clang
+  -s llvm_9:build_type=Release \
+  -o llvm_9_installer:compile_with_clang=True \
+  -o llvm_9_installer:link_libcxx=False \
+  -o llvm_9_installer:link_with_llvm_libs=True \
+  --profile clang_9_cxx11abi_llvm_libs
 
 cmake -E time \
   conan test ../test_package flexlib/master@conan/stable \
   -s build_type=Debug \
   -s cling_conan:build_type=Release \
-  -s llvm_tools:build_type=Release \
-  --profile clang
+  -s llvm_9:build_type=Release \
+  -o llvm_9_installer:compile_with_clang=True \
+  -o llvm_9_installer:link_libcxx=False \
+  -o llvm_9_installer:link_with_llvm_libs=True \
+  --profile clang_9_cxx11abi_llvm_libs
 ```
 
 ## HOW TO BUILD WITH SANITIZERS ENABLED
 
-Use `enable_asan` or `enable_ubsan`, etc.
-
-```bash
-# NOTE: change `build_type=Debug` to `build_type=Release` in production
-CONAN_REVISIONS_ENABLED=1 \
-    CONAN_VERBOSE_TRACEBACK=1 \
-    CONAN_PRINT_RUN_COMMANDS=1 \
-    CONAN_LOGGING_LEVEL=10 \
-    GIT_SSL_NO_VERIFY=true \
-    conan create . \
-        conan/stable \
-        -s build_type=Debug \
-        -s cling_conan:build_type=Release \
-        -s llvm_tools:build_type=Release \
-        --profile clang \
-        --build missing \
-        -s llvm_tools:build_type=Release \
-        -e chromium_base:enable_tests=True \
-        -o chromium_base:enable_tsan=True \
-        -e chromium_base:enable_llvm_tools=True \
-        -o chromium_base:use_alloc_shim=False \
-        -e basis:enable_tests=True \
-        -o basis:enable_tsan=True \
-        -e basis:enable_llvm_tools=True \
-        -e flexlib:enable_tests=True \
-        -o flexlib:enable_tsan=True \
-        -e flexlib:enable_llvm_tools=True \
-        -o flexlib:enable_clang_from_conan=False \
-        -o flexlib:shared=False \
-        -o chromium_tcmalloc:use_alloc_shim=False \
-        -o openssl:shared=True
-```
-
-## For contibutors: conan editable mode
-
-With the editable packages, you can tell Conan where to find the headers and the artifacts ready for consumption in your local working directory.
-There is no need to run `conan create` or `conan export-pkg`.
-
-See for details [https://docs.conan.io/en/latest/developing_packages/editable_packages.html](https://docs.conan.io/en/latest/developing_packages/editable_packages.html)
-
-Build locally:
-
-```bash
-CONAN_REVISIONS_ENABLED=1 \
-CONAN_VERBOSE_TRACEBACK=1 \
-CONAN_PRINT_RUN_COMMANDS=1 \
-CONAN_LOGGING_LEVEL=10 \
-GIT_SSL_NO_VERIFY=true \
-  cmake -E time \
-    conan install . \
-    --install-folder local_build \
-    -s build_type=Debug \
-    -s cling_conan:build_type=Release \
-    -s llvm_tools:build_type=Release \
-    --profile clang \
-      -o flexlib:shared=False \
-      -o flexlib:enable_clang_from_conan=False \
-      -e flexlib:enable_tests=True
-
-CONAN_REVISIONS_ENABLED=1 \
-CONAN_VERBOSE_TRACEBACK=1 \
-CONAN_PRINT_RUN_COMMANDS=1 \
-CONAN_LOGGING_LEVEL=10 \
-GIT_SSL_NO_VERIFY=true \
-  cmake -E time \
-    conan source . \
-    --source-folder local_build \
-    --install-folder local_build
-
-conan build . \
-  --build-folder local_build
-
-conan package . \
-  --build-folder local_build \
-  --package-folder local_build/package_dir \
-  --source-folder local_build \
-  --install-folder local_build
-```
-
-Set package to editable mode:
-
-```bash
-conan editable add local_build/package_dir \
-  flexlib/master@conan/stable
-```
-
-Note that `conanfile.py` modified to detect local builds via `self.in_local_cache`
-
-After change source in folder local_build (run commands in source package folder):
-
-```
-conan build . \
-  --build-folder local_build
-
-conan package . \
-  --build-folder local_build \
-  --package-folder local_build/package_dir \
-  --source-folder local_build \
-  --install-folder local_build
-```
-
-Build your test project
-
-In order to revert the editable mode just remove the link using:
-
-```bash
-conan editable remove \
-  flexlib/master@conan/stable
-```
+See https://github.com/blockspacer/llvm_9_installer#how-to-use-with-sanitizers
 
 ## Disclaimer
 

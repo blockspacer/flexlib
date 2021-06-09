@@ -17,14 +17,6 @@ class TestPackageConan(conan_build_helper.CMakePackage):
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake", "cmake_find_package"
 
-    # sets cmake variables required to use clang 10 from conan
-    def _is_compile_with_llvm_tools_enabled(self):
-      return self._environ_option("COMPILE_WITH_LLVM_TOOLS", default = 'false')
-
-    # installs clang 10 from conan
-    def _is_llvm_tools_enabled(self):
-      return self._environ_option("ENABLE_LLVM_TOOLS", default = 'false')
-
     def build_requirements(self):
         self.build_requires("cmake_platform_detection/master@conan/stable")
         self.build_requires("cmake_build_options/master@conan/stable")
@@ -37,10 +29,6 @@ class TestPackageConan(conan_build_helper.CMakePackage):
             or self.options['flexlib'].enable_ubsan:
           self.build_requires("cmake_sanitizers/master@conan/stable")
 
-        # provides clang-tidy, clang-format, IWYU, scan-build, etc.
-        if self._is_llvm_tools_enabled():
-          self.build_requires("llvm_tools/master@conan/stable")
-
     def build(self):
         cmake = CMake(self)
 
@@ -48,8 +36,6 @@ class TestPackageConan(conan_build_helper.CMakePackage):
         cmake.definitions['ENABLE_ASAN'] = self.options['flexlib'].enable_asan
         cmake.definitions['ENABLE_MSAN'] = self.options['flexlib'].enable_msan
         cmake.definitions['ENABLE_TSAN'] = self.options['flexlib'].enable_tsan
-
-        self.add_cmake_option(cmake, "COMPILE_WITH_LLVM_TOOLS", self._is_compile_with_llvm_tools_enabled())
 
         cmake.configure()
         cmake.build()

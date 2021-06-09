@@ -93,11 +93,6 @@ if(ENABLE_UBSAN)
   add_ubsan_flags()
 endif(ENABLE_UBSAN)
 
-if(COMPILE_WITH_LLVM_TOOLS)
-  # force change CMAKE_*_COMPILER and CMAKE_LINKER to clang from conan
-  compile_with_llvm_tools() # from cmake_helper_utils (conan package)
-endif(COMPILE_WITH_LLVM_TOOLS)
-
 set_project_version(0 0 1) # from Utils.cmake
 
 check_cmake_build_type_selected() # from Utils.cmake
@@ -301,16 +296,14 @@ if(ENABLE_CLING)
   endif()
 
   target_compile_definitions(${FLEXLIB_LIB_NAME} PUBLIC CLING_IS_ON=1)
-endif(ENABLE_CLING)
-
-if(ENABLE_CLANG_FROM_CONAN)
-  target_link_libraries( ${FLEXLIB_LIB_NAME} PUBLIC#PRIVATE
-    CONAN_PKG::libclang
-    CONAN_PKG::clang_tooling
-    CONAN_PKG::clang_tooling_core
-    CONAN_PKG::llvm_support
+else()
+  target_link_libraries( ${FLEXLIB_LIB_NAME} PUBLIC
+    CONAN_PKG::llvm_9
   )
-endif(ENABLE_CLANG_FROM_CONAN)
+  target_link_libraries( ${FLEXLIB_LIB_NAME} PRIVATE
+    CONAN_PKG::llvm_9_installer
+  )
+endif(ENABLE_CLING)
 
 target_compile_options(${FLEXLIB_LIB_NAME} PRIVATE
   $<$<CXX_COMPILER_ID:GNU>:-Wall>)
