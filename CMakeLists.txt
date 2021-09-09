@@ -298,10 +298,10 @@ if(ENABLE_CLING)
   target_compile_definitions(${FLEXLIB_LIB_NAME} PUBLIC CLING_IS_ON=1)
 else()
   target_link_libraries( ${FLEXLIB_LIB_NAME} PUBLIC
-    CONAN_PKG::llvm_9
+    CONAN_PKG::${LLVM_PACKAGE_NAME}
   )
   target_link_libraries( ${FLEXLIB_LIB_NAME} PRIVATE
-    CONAN_PKG::llvm_9_installer
+    CONAN_PKG::${LLVM_PACKAGE_NAME}_installer
   )
 endif(ENABLE_CLING)
 
@@ -310,7 +310,7 @@ target_compile_options(${FLEXLIB_LIB_NAME} PRIVATE
 
 # FIX for undefined reference to `typeinfo for clang::Decl'
 target_compile_options(${FLEXLIB_LIB_NAME} PRIVATE
-  -fno-rtti)
+  -frtti)
 
 # TODO: DISABLE_DOCTEST
 target_compile_definitions(${FLEXLIB_LIB_NAME} PUBLIC

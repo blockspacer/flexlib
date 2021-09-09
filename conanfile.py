@@ -56,7 +56,10 @@ class flexlib_conan_project(conan_build_helper.CMakePackage):
         "enable_asan": [True, False],
         "enable_msan": [True, False],
         "enable_tsan": [True, False],
-        "enable_valgrind": [True, False]
+        "enable_valgrind": [True, False],
+        "LLVM_PKG_NAME": "ANY",
+        "LLVM_PKG_VER": "ANY",
+        "LLVM_PKG_CHANNEL": "ANY",
     }
 
     default_options = (
@@ -103,6 +106,9 @@ class flexlib_conan_project(conan_build_helper.CMakePackage):
         "boost:without_container=False",
         # openssl
         "openssl:shared=True",
+        "LLVM_PKG_NAME=llvm_9",
+        "LLVM_PKG_VER=master",
+        "LLVM_PKG_CHANNEL=conan/stable",
     )
 
     # Custom attributes for Bincrafters recipe conventions
@@ -190,7 +196,6 @@ class flexlib_conan_project(conan_build_helper.CMakePackage):
               self.options["conan_gtest"].enable_tsan = True
 
     def build_requirements(self):
-        self.build_requires("llvm_9_installer/master@conan/stable")
         self.build_requires("cmake_platform_detection/master@conan/stable")
         self.build_requires("cmake_build_options/master@conan/stable")
         self.build_requires("cmake_helper_utils/master@conan/stable")
@@ -205,7 +210,11 @@ class flexlib_conan_project(conan_build_helper.CMakePackage):
           self.build_requires("cppcheck_installer/1.90@conan/stable")
 
     def requirements(self):
-      self.requires("llvm_9/master@conan/stable")
+      if not self.options.enable_cling:
+        self.requires("{}/{}@{}".format( \
+          self.options.LLVM_PKG_NAME, \
+          self.options.LLVM_PKG_VER, \
+          self.options.LLVM_PKG_CHANNEL))
 
       if self._is_tests_enabled():
           self.requires("conan_gtest/stable@conan/stable")
@@ -275,6 +284,8 @@ class flexlib_conan_project(conan_build_helper.CMakePackage):
         if not self.options.enable_valgrind:
             cmake.definitions["ENABLE_VALGRIND"] = 'OFF'
 
+        cmake.definitions["LLVM_PACKAGE_NAME"] = self.options.LLVM_PKG_NAME
+
         cmake.definitions["ENABLE_UBSAN"] = "ON" if self.options.enable_ubsan else "OFF"
 
         cmake.definitions["ENABLE_ASAN"] = "ON" if self.options.enable_asan else "OFF"
@@ -296,17 +307,17 @@ class flexlib_conan_project(conan_build_helper.CMakePackage):
 
         self.add_cmake_option(cmake, "ENABLE_TESTS", self._is_tests_enabled())
 
-        cmake.configure(build_folder=self._build_subfolder)
-
         if self.settings.compiler == 'gcc':
             cmake.definitions["CMAKE_C_COMPILER"] = "gcc-{}".format(
                 self.settings.compiler.version)
             cmake.definitions["CMAKE_CXX_COMPILER"] = "g++-{}".format(
                 self.settings.compiler.version)
 
-        cmake.definitions["ENABLE_CLING"] = "ON" if self.options.enable_cling else "OFF"
+        cmake.definitions["ENABLE_CLING"] = "ON" #if self.options.enable_cling else "OFF"
 
         cmake.definitions["CMAKE_TOOLCHAIN_FILE"] = 'conan_paths.cmake'
+
+        cmake.configure(build_folder=self._build_subfolder)
 
         return cmake
 

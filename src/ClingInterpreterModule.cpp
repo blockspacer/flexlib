@@ -1,13 +1,20 @@
 ﻿#include "flexlib/ClingInterpreterModule.hpp" // IWYU pragma: associated
 
 #include <base/check.h>
+#include <base/run_loop.h>
+#include "base/files/file.h"
+#include "base/files/file_util.h"
+#include "base/base_paths.h"
+#include "basis/path_provider.h"
+#include "base/path_service.h"
+/// \todo use boost outcome for error reporting
+#include <base/logging.h>
 
 #if defined(CLING_IS_ON)
 
 #include "flexlib/options/ctp/options.hpp"
 
-/// \todo use boost outcome for error reporting
-#include <base/logging.h>
+#include <basic/multiconfig/multiconfig.h>
 
 #include <llvm/Support/raw_ostream.h>
 
@@ -66,11 +73,52 @@ ClingInterpreter::ClingInterpreter(
     << "You must provide at least one argument"
        " to Cling interpreter";
 
-  interpreter_
-    = std::make_unique<cling::Interpreter>(
-        args.size()
-        , &(args[0])
-        , LLVMDIR);
+  ::base::FilePath file_exe_{};
+
+  if (!base::PathService::Get(base::FILE_EXE, &file_exe_)) {
+    NOTREACHED();
+    // stop app execution with EXIT_FAILURE
+    return;
+  }
+
+  /// \note returns empty string if the path is not ASCII.
+  const std::string maybe_base_exe_name_
+    = file_exe_.BaseName().RemoveExtension().MaybeAsASCII();
+
+  MULTICONF_String(llvm_dir
+    , /* default value */ LLVMDIR
+    , BUILTIN_MULTICONF_LOADERS
+    , /* name of configuration group */ maybe_base_exe_name_);
+
+  /// \note will cache configuration values,
+  /// so use `resetAndReload` if you need to update configuration values.
+  CHECK_OK(basic::MultiConf::GetInstance().resetAndReload())
+    << "Wrong configuration.";
+
+  /// \todo replace resetAndReload with reloadOptionWithName
+  ///CHECK_OK(basic::MultiConf::GetInstance().reloadOptionWithName("llvm_dir"
+  ///  , /* name of configuration group */ maybe_base_exe_name_))
+  ///  << "Wrong configuration.";
+
+  /// \note required to refresh configuration cache
+  base::RunLoop().RunUntilIdle();
+
+  {
+    const std::string& llvm_dir_str = llvm_dir.GetValue();
+    LOG(INFO)
+      << "You can"
+      << (llvm_dir_str.empty() ? " set" : " change")
+      << " path to LLVM folder: "
+      << llvm_dir.optionFormatted()
+      << (llvm_dir_str.empty() ? "" : " Using path to llvm: ")
+      << llvm_dir_str;
+
+    interpreter_
+      = std::make_unique<cling::Interpreter>(
+          args.size()
+          , &(args[0])
+          , llvm_dir_str.c_str());
+  }
 
   for(const std::string& it: includePaths) {
     interpreter_->AddIncludePath(it.c_str());
